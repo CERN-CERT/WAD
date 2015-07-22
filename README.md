@@ -31,14 +31,18 @@ Command: `wad_detect -u https://pypi.python.org/`
 Output:
 
 ```
-https://pypi.python.org/pypi:
-- app: Varnish
-  type: cache-tools
-  ver: null
-- app: Nginx
-  type: web-servers
-  ver: 1.6.2
-- app: Google Analytics
-  type: analytics
-  ver: null
+{
+    "https://pypi.python.org/pypi": [
+        {
+            "type": "cache-tools", 
+            "app": "Varnish", 
+            "ver": null
+        }, 
+        {
+            "type": "web-servers", 
+            "app": "Nginx", 
+            "ver": "1.6.2"
+        }
+    ]
+}p
 ```
