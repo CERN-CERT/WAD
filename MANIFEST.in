@@ -1,0 +1,4 @@
+include LICENSE
+include AUTHORS.md
+include README.md
+recursive-include wad/etc *
