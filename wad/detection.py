@@ -31,7 +31,7 @@ class Detector(object):
         try:
             page = tools.urlopen(url, timeout=timeout)
             url = page.geturl()
-        except urllib2.URLError, e:
+        except (urllib2.URLError, HTTPException), e:
             # a network problem? page unavailable? wrong URL?
             logging.warning("Error opening %s, terminating: %s", url, tools.error_to_str(e))
             return {}
