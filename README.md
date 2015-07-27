@@ -1,4 +1,6 @@
 # WAD - Web application detector
+[![Build Status](https://travis-ci.org/CERN-CERT/WAD.svg?branch=master)](https://travis-ci.org/CERN-CERT/WAD)
+
 WAD lets you analyze given URL(s) and detect technologies used by web application behind that URL, 
 from the OS and web server level, to the programming platform and frameworks, as well as server- and client-side
 applications, tools and libraries. 
