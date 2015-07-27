@@ -212,7 +212,7 @@ class TestDetector(unittest.TestCase):
             ]
         }
 
-        with mock.patch('wad.wad_detect.tools') as mockObj:
+        with mock.patch('wad.wad.tools') as mockObj:
             page = mock.Mock()
             page.geturl.return_value = cern_ch_test_data['geturl']
             page.read.return_value = cern_ch_test_data['content']

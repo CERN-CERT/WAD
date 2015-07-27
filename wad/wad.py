@@ -20,7 +20,7 @@ from detection import TIMEOUT, Detector
 
 
 def main(timeout=TIMEOUT):
-    desc = """WAD detect -
+    desc = """WAD -
 This component analyzes given URL(s) and detects technologies, libraries,
 frameworks etc. used by this application, from the OS and web server level,
 to the programming platform and frameworks, and server- and client-side

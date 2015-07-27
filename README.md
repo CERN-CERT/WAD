@@ -23,10 +23,10 @@ Results are categorized depending on type of technology (whether it is CMS or da
 technologies that can be discovered using WAD.
 
 ## Usage
-Use `wad_detect -h` to print help text.
+Use `wad -h` to print help text.
 JSON is used for convenient formatting of output data.
 ### Example usage scenario
-Command: `wad_detect -u https://pypi.python.org/` 
+Command: `wad -u https://pypi.python.org/` 
 
 Output:
 
