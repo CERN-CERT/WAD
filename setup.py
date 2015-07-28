@@ -18,7 +18,7 @@ setup(
     author_email='sebastian.lopienski@cern.ch',
     packages=find_packages(),
     include_package_data=True,
-    requires=['simplejson', 'six'],
+    requires=['six'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Information Technology',

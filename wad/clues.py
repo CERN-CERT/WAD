@@ -12,7 +12,7 @@ import logging
 import re
 
 from . import tools
-import simplejson as json
+import json
 
 CLUES_FILE = os.path.join(os.path.dirname(__file__), 'etc/apps.json')
 

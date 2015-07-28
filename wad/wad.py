@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 from optparse import OptionParser
 
-import simplejson as json
+import json
 
 from . import tools
 from .clues import Clues, CLUES_FILE
