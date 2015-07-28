@@ -3,20 +3,16 @@
 #
 # Author: Sebastian.Lopienski@cern.ch
 #
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import logging
 from optparse import OptionParser
 
-# preferring simplejson but fallback to json - this should work both on python 2.4 and 2.6
-# for more see http://stackoverflow.com/a/712799
+import simplejson as json
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
-
-import tools
-from clues import Clues, CLUES_FILE
-from detection import TIMEOUT, Detector
+from . import tools
+from .clues import Clues, CLUES_FILE
+from .detection import TIMEOUT, Detector
 
 
 def main(timeout=TIMEOUT):
@@ -69,7 +65,7 @@ etc."""
             f = open(options.urls[1:])
             urls = f.readlines()
             f.close()
-        except Exception, e:
+        except Exception as e:
             # an I/O exception?
             logging.error("Error reading URL file %s, terminating: %s", options.urls[1:], tools.error_to_str(e))
             return
@@ -86,13 +82,13 @@ etc."""
             f.write(json.dumps(results))
             f.close()
             logging.debug("Results written to file %s", options.output_file)
-        except Exception, e:
+        except Exception as e:
             # an I/O exception?
             logging.error("Error writing results to file %s, terminating: %s", options.output_file,
                           tools.error_to_str(e))
             return
     else:
-        print json.dumps(results, indent=4)
+        print(json.dumps(results, indent=4))
 
 
 if __name__ == "__main__":

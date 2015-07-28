@@ -1,18 +1,13 @@
 # Module tools
 #
 # Author: Sebastian Lopienski <Sebastian.Lopienski@cern.ch>
+from __future__ import absolute_import, division, print_function, unicode_literals
+from six.moves import urllib
 
-
-# python 2.5+ -> hashlib; before -> md5
-try:
-    from hashlib import md5
-except ImportError:
-    from md5 import md5
-
+from hashlib import md5
 import logging
 import sys
 
-import urllib2
 
 
 # ===========================================================================================================
@@ -44,11 +39,11 @@ def hash_id(x):
 
 def urlopen(url, timeout):
     headers = {'User-Agent': 'Mozilla/5.0 Firefox/33.0'}
-    req = urllib2.Request(url, None, headers)
+    req = urllib.request.Request(url, None, headers)
     try:
-        page = urllib2.urlopen(req, timeout=timeout)
+        page = urllib.request.urlopen(req, timeout=timeout)
     except TypeError:
-        page = urllib2.urlopen(req)
+        page = urllib.request.urlopen(req)
     return page
 
 

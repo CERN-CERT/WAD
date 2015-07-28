@@ -4,19 +4,15 @@
 # more info:    https://github.com/AliasIO/Wappalyzer/blob/master/README.md
 # detection:    https://github.com/AliasIO/Wappalyzer/blob/master/src/wappalyzer.js
 # JavaScript RegExp object: http://www.w3schools.com/jsref/jsref_obj_regexp.asp
+from __future__ import absolute_import, division, print_function, unicode_literals
+from functools import reduce
 
 import os
 import logging
 import re
 
-import tools
-
-# preferring simplejson but fallback to json - this should work both on python 2.4 and 2.6
-# for more see http://stackoverflow.com/a/712799
-try:
-    import simplejson as json
-except ImportError:
-    import json
+from . import tools
+import simplejson as json
 
 CLUES_FILE = os.path.join(os.path.dirname(__file__), 'etc/apps.json')
 
@@ -39,13 +35,13 @@ class _Clues(object):
         logging.info("Reading clues file %s", filename)
         try:
             json_data = open(filename)
-        except IOError, e:
+        except IOError as e:
             logging.error("Error while opening clues file, terminating: %s", tools.error_to_str(e))
             raise
 
         try:
             clues = json.load(json_data, encoding='utf-8')
-        except ValueError, e:
+        except ValueError as e:
             logging.error("Error while reading JSON file, terminating: %s", tools.error_to_str(e))
             raise
 
@@ -64,7 +60,7 @@ class _Clues(object):
     def string_to_array(self, tag):
         for app in self.apps:
             if tag in self.apps[app]:
-                if type(self.apps[app][tag]) in [str, unicode]:
+                if type(self.apps[app][tag]) is str:
                     self.apps[app][tag] = [self.apps[app][tag]]
 
     def ignore_attributes(self, tag):

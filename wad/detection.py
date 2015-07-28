@@ -1,13 +1,16 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+from six.moves import urllib
+from six.moves import http_client
+from functools import reduce
+
 from _ssl import SSLError
 import copy
-from httplib import HTTPException
 import logging
-import re
 import socket
-import urllib2
+import re
 
-import tools
-from clues import Clues
+from . import tools
+from .clues import Clues
 
 re_meta = re.compile('<meta[^>]+name\s*=\s*["\']([^"\']*)["\'][^>]+content\s*=\s*["\']([^"\']*)', re.IGNORECASE)
 re_script = re.compile('<script[^>]+src\s*=\s*["\']([^"\']*)', re.IGNORECASE)
@@ -31,7 +34,7 @@ class Detector(object):
         try:
             page = tools.urlopen(url, timeout=timeout)
             url = page.geturl()
-        except (urllib2.URLError, HTTPException), e:
+        except (urllib.error.URLError, http_client.HTTPException) as e:
             # a network problem? page unavailable? wrong URL?
             logging.warning("Error opening %s, terminating: %s", url, tools.error_to_str(e))
             return {}
@@ -44,15 +47,8 @@ class Detector(object):
 
         try:
             content = page.read()
-        except socket.timeout, e:
-            # timeout
-            logging.info("Timeout when reading %s, terminating: %s", url, tools.error_to_str(e))
-            return {}
-        except HTTPException, e:
-            logging.info("HTTPException when reading %s, terminating: %s", url, tools.error_to_str(e))
-            return {}
-        except SSLError, e:
-            logging.info("SSLError when reading %s, terminating: %s", url, tools.error_to_str(e))
+        except (socket.timeout, http_client.HTTPException, SSLError) as e:
+            logging.info("Exception while reading %s, terminating: %s", url, tools.error_to_str(e))
             return {}
 
         findings += self.check_url(url)  # 'url'
@@ -114,7 +110,7 @@ class Detector(object):
                             ver = ternary.group(3)
                     else:
                         ver = match.expand(version_pattern)
-                except Exception, e:
+                except Exception as e:
                     logging.debug("Version not detected: expanding '%s' with '%s' failed: %s", show_text, re_raw,
                                   tools.error_to_str(e))
                     ver = None

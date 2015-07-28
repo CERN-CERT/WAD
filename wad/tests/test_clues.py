@@ -1,3 +1,6 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+from functools import reduce
+
 import re
 import os
 from wad import tools
@@ -11,7 +14,7 @@ def get_fields(app, key, rules_list):
     # returns a list of (app-ruletype-rule, fieldkey, fieldvalue) tuples,
     # e.g. ('LabVIEW-headers-Server', 'version', '\\1')
     return map(
-        lambda (k, v): [("%s-%s-%s" % (app, key, k), k1, v1) for (k1, v1) in v.iteritems() if k1 != 're'],
+        lambda item: [("%s-%s-%s" % (app, key, item[0]), k1, v1) for (k1, v1) in item[1].iteritems() if k1 != 're'],
         rules_list
     )
 
@@ -96,7 +99,6 @@ def test_compile_clues():
                 fields += reduce(list.__add__, get_fields(app, key, tools.dict2list(apps[app][key + '_re'])))
 
     assert len(fields) > 200
-    # print(fields)
 
     # are there only 'version' and 'confidence' fields?
     assert set([k for (_, k, _) in fields]) == set(['confidence', 'version'])
