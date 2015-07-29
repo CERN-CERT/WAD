@@ -5,14 +5,14 @@
 # detection:    https://github.com/AliasIO/Wappalyzer/blob/master/src/wappalyzer.js
 # JavaScript RegExp object: http://www.w3schools.com/jsref/jsref_obj_regexp.asp
 from __future__ import absolute_import, division, print_function, unicode_literals
-from functools import reduce
-
+from six.moves import map, reduce
+from pprint import pprint
 import os
 import logging
 import re
-
-from . import tools
 import json
+
+import tools
 
 CLUES_FILE = os.path.join(os.path.dirname(__file__), 'etc/apps.json')
 
@@ -60,7 +60,7 @@ class _Clues(object):
     def string_to_array(self, tag):
         for app in self.apps:
             if tag in self.apps[app]:
-                if type(self.apps[app][tag]) is str:
+                if type(self.apps[app][tag]) is unicode:
                     self.apps[app][tag] = [self.apps[app][tag]]
 
     def ignore_attributes(self, tag):
@@ -118,7 +118,7 @@ class _Clues(object):
             regexps = {}
             for key in self.apps[app]:
                 if key in ['script', 'html', 'url']:
-                    regexps[key + "_re"] = map(self.compile_clue, self.apps[app][key])
+                    regexps[key + "_re"] = list(map(self.compile_clue, self.apps[app][key]))
                 if key in ['meta', 'headers']:
                     regexps[key + "_re"] = {}
                     for entry in self.apps[app][key]:

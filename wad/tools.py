@@ -9,18 +9,6 @@ import logging
 import sys
 
 
-
-# ===========================================================================================================
-# From http://badpopcorn.com/blog/2006/03/16/map-filter-and-reduce-over-python-dictionaries/
-
-# Uses the list composition to make the key value pairs over a dictionary.
-dict2list = lambda dic: [(k, v) for (k, v) in dic.iteritems()]
-
-# Use the built in dictionary constructor to convert the list.
-list2dict = lambda lis: dict(lis)
-# ===========================================================================================================
-
-
 def count(d, e):
     # TODO: Use collections.Counter once moved to python 2.7
     if type(e) == list:
@@ -34,7 +22,7 @@ def count(d, e):
 
 
 def hash_id(x):
-    return md5("%s" % x).hexdigest()[:8]
+    return md5(("%s" % x).encode('utf-8')).hexdigest()[:8]
 
 
 def urlopen(url, timeout):
@@ -66,7 +54,7 @@ def add_log_options(parser):
 
 
 def use_log_options(options):
-    log_format = '%(asctime)s (' + hash_id(options) + '):%(module)s:%(levelname)s %(message)s'
+    log_format = '%(asctime)s (' + hash_id(options.__str__()) + '):%(module)s:%(levelname)s %(message)s'
 
     date_format = '%Y/%m/%d-%H:%M:%S'
     log_level = logging.WARNING

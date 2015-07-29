@@ -1,5 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from functools import reduce
+from six import iterkeys, iteritems
+from six.moves import map, filter
 
 import re
 import os
@@ -13,10 +15,10 @@ CLUES_FILE = os.path.join(os.path.dirname(__file__), '../etc/apps.json')
 def get_fields(app, key, rules_list):
     # returns a list of (app-ruletype-rule, fieldkey, fieldvalue) tuples,
     # e.g. ('LabVIEW-headers-Server', 'version', '\\1')
-    return map(
-        lambda item: [("%s-%s-%s" % (app, key, item[0]), k1, v1) for (k1, v1) in item[1].iteritems() if k1 != 're'],
+    return list(map(
+        lambda item: [("%s-%s-%s" % (app, key, item[0]), k1, v1) for (k1, v1) in iteritems(item[1]) if k1 != 're'],
         rules_list
-    )
+    ))
 
 
 def test_clues_correct():
@@ -42,7 +44,7 @@ def test_clues_correct():
         'cats': {'min_expected_amount': len(apps)},
         'catsStr': {'min_expected_amount': len(apps)},
     }
-    expected_str_types = set([str, unicode])
+    expected_str_types = set([str])
 
     for app in apps:
         for t in apps[app]:
@@ -52,18 +54,18 @@ def test_clues_correct():
     assert set(reduce(list.__add__, [apps[a]['cats'] for a in apps])) <= set([int(x) for x in categories.keys()])
 
     # check if only expected fields are defined for apps
-    assert set(types.keys()) == set(fields.keys() + basic_fields.keys())
+    assert set(iterkeys(types)) == set(itertools.chain(iterkeys(fields), iterkeys(basic_fields)))
 
     # check if numbers of entries are as expected
     assert len(apps) > 700
-    for field, field_dict in itertools.chain(fields.iteritems(), basic_fields.iteritems()):
+    for field, field_dict in itertools.chain(iteritems(fields), iteritems(basic_fields)):
         assert types[field] >= field_dict['min_expected_amount']
 
     # check if all implies are lists of unicodes, headers and meta are dictionaries of str/unicode,
     # and others (including app names) are str/unicode
     assert set([type(a) for a in apps]) <= expected_str_types
 
-    for field, field_dict in fields.iteritems():
+    for field, field_dict in iteritems(fields):
         assert set([type(apps[a][field]) for a in apps if field in apps[a]]) <= set([field_dict['expected_type']])
         assert set([type(v) for a in apps if field in apps[a] for v in apps[a][field]]) <= expected_str_types
 
@@ -96,7 +98,8 @@ def test_compile_clues():
             if key in ['script', 'html', 'url']:
                 fields += reduce(list.__add__, get_fields(app, key, list(enumerate(apps[app][key + '_re']))))
             if key in ['meta', 'headers']:
-                fields += reduce(list.__add__, get_fields(app, key, tools.dict2list(apps[app][key + '_re'])))
+                fields += reduce(list.__add__, get_fields(app, key,
+                                                          [item for item in iteritems(apps[app][key + '_re'])]))
 
     assert len(fields) > 200
 
@@ -104,8 +107,7 @@ def test_compile_clues():
     assert set([k for (_, k, _) in fields]) == set(['confidence', 'version'])
 
     # are 'confidentiality' values always between 0 and 100?
-    assert (filter(lambda x: not (0 < int(x) < 100), set([v for (_, k, v) in fields if k == 'confidence']))
-            == [])
+    assert list(filter(lambda x: not (0 < int(x) < 100), set([v for (_, k, v) in fields if k == 'confidence']))) == []
 
     # are 'version' values known/expected? or any new? if new, then test whether they work fine
     assert (set([v for (_, k, v) in fields if k == 'version']) ==

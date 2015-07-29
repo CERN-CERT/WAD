@@ -1,7 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-from six.moves import urllib
-from six.moves import http_client
-from functools import reduce
+from six.moves import urllib, http_client, reduce
+from six import iteritems
 
 from _ssl import SSLError
 import copy
@@ -9,8 +8,8 @@ import logging
 import socket
 import re
 
-from . import tools
-from .clues import Clues
+import tools
+from clues import Clues
 
 re_meta = re.compile('<meta[^>]+name\s*=\s*["\']([^"\']*)["\'][^>]+content\s*=\s*["\']([^"\']*)', re.IGNORECASE)
 re_script = re.compile('<script[^>]+src\s*=\s*["\']([^"\']*)', re.IGNORECASE)
@@ -159,7 +158,8 @@ class Detector(object):
         return found
 
     def check_headers(self, headers):
-        headers = dict((k.lower(), v) for k, v in headers.dict.iteritems())
+        import pdb; pdb.set_trace()
+        headers = dict((k.lower(), v) for k, v in iteritems(headers.dict))
 
         found = []
         for app in self.apps:
