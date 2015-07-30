@@ -1,10 +1,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+import six
 
 import copy
 import unittest
 import mock
 import operator
-from six import iterkeys, itervalues, next
+
 from wad.detection import Detector, TIMEOUT
 from wad.tests.data.data_test_wad import cern_ch_test_data
 
@@ -75,12 +76,9 @@ class TestDetector(unittest.TestCase):
         assert self.detector.check_script(" dcsaasd f<script     src='' >") == []
 
     def test_check_headers(self):
-        headers = {
-            'Host': 'abc.com',
-            'Server': 'Linux Ubuntu 12.10',
-        }
+        headers = [('Host', 'abc.com'), ('Server', 'Linux Ubuntu 12.10')]
         headers_mock = mock.Mock()
-        headers_mock.dict = headers
+        headers_mock.items.return_value = headers
 
         assert (self.detector.check_headers(headers_mock) ==
                 [{'app': 'Ubuntu', 'ver': None}])
@@ -219,15 +217,18 @@ class TestDetector(unittest.TestCase):
         with mock.patch('wad.detection.tools') as mockObj:
             page = mock.Mock()
             page.geturl.return_value = cern_ch_test_data['geturl']
-            page.read.return_value = cern_ch_test_data['content']
+            if six.PY3:
+                page.read.return_value = bytes(cern_ch_test_data['content'], encoding='utf-8')
+            else:
+                page.read.return_value = cern_ch_test_data['content']
             headers_mock = mock.Mock()
-            headers_mock.dict = cern_ch_test_data['headers']
+            headers_mock.items.return_value = cern_ch_test_data['headers'].items()
             page.info.return_value = headers_mock
             mockObj.urlopen = mock.Mock(return_value=page)
             results = self.detector.detect('http://cern.ch')
-            assert list(iterkeys(results)) == list(iterkeys(expected))
-            assert (sorted(next(itervalues(results)), key=operator.itemgetter('app')) ==
-                    sorted(next(itervalues(expected)), key=operator.itemgetter('app')))
+            assert list(six.iterkeys(results)) == list(six.iterkeys(expected))
+            assert (sorted(next(six.itervalues(results)), key=operator.itemgetter('app')) ==
+                    sorted(next(six.itervalues(expected)), key=operator.itemgetter('app')))
 
     def test_detect_multiple(self):
         urls_list = ["http://cern.ch", None, "", "http://cern.ch", "example.com"]

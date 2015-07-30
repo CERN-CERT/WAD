@@ -1,6 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-from six.moves import urllib, http_client, reduce
-from six import iteritems
+import six
 
 from _ssl import SSLError
 import copy
@@ -33,7 +32,7 @@ class Detector(object):
         try:
             page = tools.urlopen(url, timeout=timeout)
             url = page.geturl()
-        except (urllib.error.URLError, http_client.HTTPException) as e:
+        except (six.moves.urllib.error.URLError, six.moves.http_client.HTTPException) as e:
             # a network problem? page unavailable? wrong URL?
             logging.warning("Error opening %s, terminating: %s", url, tools.error_to_str(e))
             return {}
@@ -46,9 +45,12 @@ class Detector(object):
 
         try:
             content = page.read()
-        except (socket.timeout, http_client.HTTPException, SSLError) as e:
+        except (socket.timeout, six.moves.http_client.HTTPException, SSLError) as e:
             logging.info("Exception while reading %s, terminating: %s", url, tools.error_to_str(e))
             return {}
+
+        if six.PY3:
+            content = content.decode()
 
         findings += self.check_url(url)  # 'url'
         if page:
@@ -158,8 +160,7 @@ class Detector(object):
         return found
 
     def check_headers(self, headers):
-        import pdb; pdb.set_trace()
-        headers = dict((k.lower(), v) for k, v in iteritems(headers.dict))
+        headers = dict((k.lower(), v) for k, v in headers.items())
 
         found = []
         for app in self.apps:
@@ -171,9 +172,9 @@ class Detector(object):
         return found
 
     def implied_by(self, app_list):
-        return list(set(reduce(list.__add__,
-                               [self.apps[app]['implies'] for app in app_list if 'implies' in self.apps[app]],
-                               []))
+        return list(set(six.moves.reduce(list.__add__,
+                                         [self.apps[app]['implies'] for app in app_list if 'implies' in self.apps[app]],
+                                         []))
                     - set(app_list))
 
     def follow_implies(self, findings):
@@ -215,9 +216,9 @@ class Detector(object):
                 findings += [t]
 
     def excluded_by(self, app_list):
-        to_exclude = list(set(reduce(list.__add__,
-                                     [self.apps[app]['excludes'] for app in app_list if 'excludes' in self.apps[app]],
-                                     [])))
+        to_exclude = list(
+            set(six.moves.reduce(list.__add__,
+                                 [self.apps[app]['excludes'] for app in app_list if 'excludes' in self.apps[app]], [])))
         if len(to_exclude) > 0:
             logging.info("  - excluding apps: %s", ','.join(to_exclude))
         return to_exclude

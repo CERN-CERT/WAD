@@ -2,7 +2,7 @@
 #
 # Author: Sebastian Lopienski <Sebastian.Lopienski@cern.ch>
 from __future__ import absolute_import, division, print_function, unicode_literals
-from six.moves import urllib
+import six
 
 from hashlib import md5
 import logging
@@ -27,11 +27,11 @@ def hash_id(x):
 
 def urlopen(url, timeout):
     headers = {'User-Agent': 'Mozilla/5.0 Firefox/33.0'}
-    req = urllib.request.Request(url, None, headers)
+    req = six.moves.urllib.request.Request(url, None, headers)
     try:
-        page = urllib.request.urlopen(req, timeout=timeout)
+        page = six.moves.urllib.request.urlopen(req, timeout=timeout)
     except TypeError:
-        page = urllib.request.urlopen(req)
+        page = six.moves.urllib.request.urlopen(req)
     return page
 
 
