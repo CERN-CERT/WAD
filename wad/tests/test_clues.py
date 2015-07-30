@@ -5,8 +5,8 @@ from six.moves import map, filter
 
 import re
 import os
-from wad import tools
-from wad.clues import _Clues
+from __main__ import tools
+from __main__.clues import _Clues
 import itertools
 
 CLUES_FILE = os.path.join(os.path.dirname(__file__), '../etc/apps.json')

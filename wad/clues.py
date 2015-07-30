@@ -6,13 +6,13 @@
 # JavaScript RegExp object: http://www.w3schools.com/jsref/jsref_obj_regexp.asp
 from __future__ import absolute_import, division, print_function, unicode_literals
 from six.moves import map, reduce
-from pprint import pprint
+
 import os
 import logging
 import re
 import json
 
-import tools
+from wad import tools
 
 CLUES_FILE = os.path.join(os.path.dirname(__file__), 'etc/apps.json')
 

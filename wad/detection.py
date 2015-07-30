@@ -8,8 +8,8 @@ import logging
 import socket
 import re
 
-import tools
-from clues import Clues
+from wad import tools
+from wad.clues import Clues
 
 re_meta = re.compile('<meta[^>]+name\s*=\s*["\']([^"\']*)["\'][^>]+content\s*=\s*["\']([^"\']*)', re.IGNORECASE)
 re_script = re.compile('<script[^>]+src\s*=\s*["\']([^"\']*)', re.IGNORECASE)

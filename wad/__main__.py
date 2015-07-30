@@ -10,9 +10,9 @@ from optparse import OptionParser
 
 import json
 
-import tools
-from clues import Clues, CLUES_FILE
-from detection import TIMEOUT, Detector
+from wad import tools
+from wad.clues import Clues, CLUES_FILE
+from wad.detection import TIMEOUT, Detector
 
 
 def main(timeout=TIMEOUT):

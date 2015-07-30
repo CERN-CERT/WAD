@@ -39,7 +39,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'wad = wad.wad:main'
+            'wad = wad.__main__:main'
         ]
     },
 )
