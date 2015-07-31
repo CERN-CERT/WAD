@@ -1,29 +1,12 @@
 # Module tools
 #
 # Author: Sebastian Lopienski <Sebastian.Lopienski@cern.ch>
+from __future__ import absolute_import, division, print_function, unicode_literals
+import six
 
-
-# python 2.5+ -> hashlib; before -> md5
-try:
-    from hashlib import md5
-except ImportError:
-    from md5 import md5
-
+from hashlib import md5
 import logging
 import sys
-
-import urllib2
-
-
-# ===========================================================================================================
-# From http://badpopcorn.com/blog/2006/03/16/map-filter-and-reduce-over-python-dictionaries/
-
-# Uses the list composition to make the key value pairs over a dictionary.
-dict2list = lambda dic: [(k, v) for (k, v) in dic.iteritems()]
-
-# Use the built in dictionary constructor to convert the list.
-list2dict = lambda lis: dict(lis)
-# ===========================================================================================================
 
 
 def count(d, e):
@@ -39,16 +22,16 @@ def count(d, e):
 
 
 def hash_id(x):
-    return md5("%s" % x).hexdigest()[:8]
+    return md5(("%s" % x).encode('utf-8')).hexdigest()[:8]
 
 
 def urlopen(url, timeout):
     headers = {'User-Agent': 'Mozilla/5.0 Firefox/33.0'}
-    req = urllib2.Request(url, None, headers)
+    req = six.moves.urllib.request.Request(url, None, headers)
     try:
-        page = urllib2.urlopen(req, timeout=timeout)
+        page = six.moves.urllib.request.urlopen(req, timeout=timeout)
     except TypeError:
-        page = urllib2.urlopen(req)
+        page = six.moves.urllib.request.urlopen(req)
     return page
 
 
@@ -71,7 +54,7 @@ def add_log_options(parser):
 
 
 def use_log_options(options):
-    log_format = '%(asctime)s (' + hash_id(options) + '):%(module)s:%(levelname)s %(message)s'
+    log_format = '%(asctime)s (' + hash_id(options.__str__()) + '):%(module)s:%(levelname)s %(message)s'
 
     date_format = '%Y/%m/%d-%H:%M:%S'
     log_level = logging.WARNING

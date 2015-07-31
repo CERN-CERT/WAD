@@ -12,12 +12,13 @@ setup(
     version='0.1.0',
     description='A tool for detecting technologies used by web applications.',
     long_description=long_description,
-    url='',  # TODO: fill with github repo url
+    url='https://github.com/CERN-CERT/WAD',
     license='GPLv3',
     author='Sebastian Lopienski',
     author_email='sebastian.lopienski@cern.ch',
     packages=find_packages(),
     include_package_data=True,
+    requires=['six'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Information Technology',
@@ -29,12 +30,16 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
         'Topic :: Security',
         'Topic :: Internet :: WWW/HTTP',
     ],
     entry_points={
         'console_scripts': [
-            'wad = wad.wad:main'
+            'wad = wad.__main__:main'
         ]
     },
 )

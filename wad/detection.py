@@ -1,13 +1,14 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+import six
+
 from _ssl import SSLError
 import copy
-from httplib import HTTPException
 import logging
-import re
 import socket
-import urllib2
+import re
 
-import tools
-from clues import Clues
+from wad import tools
+from wad.clues import Clues
 
 re_meta = re.compile('<meta[^>]+name\s*=\s*["\']([^"\']*)["\'][^>]+content\s*=\s*["\']([^"\']*)', re.IGNORECASE)
 re_script = re.compile('<script[^>]+src\s*=\s*["\']([^"\']*)', re.IGNORECASE)
@@ -31,7 +32,7 @@ class Detector(object):
         try:
             page = tools.urlopen(url, timeout=timeout)
             url = page.geturl()
-        except (urllib2.URLError, HTTPException), e:
+        except (six.moves.urllib.error.URLError, six.moves.http_client.HTTPException) as e:
             # a network problem? page unavailable? wrong URL?
             logging.warning("Error opening %s, terminating: %s", url, tools.error_to_str(e))
             return {}
@@ -44,16 +45,12 @@ class Detector(object):
 
         try:
             content = page.read()
-        except socket.timeout, e:
-            # timeout
-            logging.info("Timeout when reading %s, terminating: %s", url, tools.error_to_str(e))
+        except (socket.timeout, six.moves.http_client.HTTPException, SSLError) as e:
+            logging.info("Exception while reading %s, terminating: %s", url, tools.error_to_str(e))
             return {}
-        except HTTPException, e:
-            logging.info("HTTPException when reading %s, terminating: %s", url, tools.error_to_str(e))
-            return {}
-        except SSLError, e:
-            logging.info("SSLError when reading %s, terminating: %s", url, tools.error_to_str(e))
-            return {}
+
+        if six.PY3:
+            content = content.decode()
 
         findings += self.check_url(url)  # 'url'
         if page:
@@ -114,7 +111,7 @@ class Detector(object):
                             ver = ternary.group(3)
                     else:
                         ver = match.expand(version_pattern)
-                except Exception, e:
+                except Exception as e:
                     logging.debug("Version not detected: expanding '%s' with '%s' failed: %s", show_text, re_raw,
                                   tools.error_to_str(e))
                     ver = None
@@ -163,7 +160,7 @@ class Detector(object):
         return found
 
     def check_headers(self, headers):
-        headers = dict((k.lower(), v) for k, v in headers.dict.iteritems())
+        headers = dict((k.lower(), v) for k, v in headers.items())
 
         found = []
         for app in self.apps:
@@ -175,9 +172,9 @@ class Detector(object):
         return found
 
     def implied_by(self, app_list):
-        return list(set(reduce(list.__add__,
-                               [self.apps[app]['implies'] for app in app_list if 'implies' in self.apps[app]],
-                               []))
+        return list(set(six.moves.reduce(list.__add__,
+                                         [self.apps[app]['implies'] for app in app_list if 'implies' in self.apps[app]],
+                                         []))
                     - set(app_list))
 
     def follow_implies(self, findings):
@@ -219,9 +216,9 @@ class Detector(object):
                 findings += [t]
 
     def excluded_by(self, app_list):
-        to_exclude = list(set(reduce(list.__add__,
-                                     [self.apps[app]['excludes'] for app in app_list if 'excludes' in self.apps[app]],
-                                     [])))
+        to_exclude = list(
+            set(six.moves.reduce(list.__add__,
+                                 [self.apps[app]['excludes'] for app in app_list if 'excludes' in self.apps[app]], [])))
         if len(to_exclude) > 0:
             logging.info("  - excluding apps: %s", ','.join(to_exclude))
         return to_exclude

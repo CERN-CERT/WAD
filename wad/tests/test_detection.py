@@ -1,6 +1,11 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+import six
+
 import copy
 import unittest
 import mock
+import operator
+
 from wad.detection import Detector, TIMEOUT
 from wad.tests.data.data_test_wad import cern_ch_test_data
 
@@ -71,12 +76,9 @@ class TestDetector(unittest.TestCase):
         assert self.detector.check_script(" dcsaasd f<script     src='' >") == []
 
     def test_check_headers(self):
-        headers = {
-            'Host': 'abc.com',
-            'Server': 'Linux Ubuntu 12.10',
-        }
+        headers = [('Host', 'abc.com'), ('Server', 'Linux Ubuntu 12.10')]
         headers_mock = mock.Mock()
-        headers_mock.dict = headers
+        headers_mock.items.return_value = headers
 
         assert (self.detector.check_headers(headers_mock) ==
                 [{'app': 'Ubuntu', 'ver': None}])
@@ -206,26 +208,32 @@ class TestDetector(unittest.TestCase):
                 {'app': 'Google Font API',
                  'type': 'font-scripts',
                  'ver': None},
-                {'app': u'PHP',
+                {'app': 'PHP',
                  'type': 'programming-languages',
                  'ver': None}
             ]
         }
 
-        with mock.patch('wad.wad.tools') as mockObj:
+        with mock.patch('wad.detection.tools') as mockObj:
             page = mock.Mock()
             page.geturl.return_value = cern_ch_test_data['geturl']
-            page.read.return_value = cern_ch_test_data['content']
+            if six.PY3:
+                page.read.return_value = bytes(cern_ch_test_data['content'], encoding='utf-8')
+            else:
+                page.read.return_value = cern_ch_test_data['content']
             headers_mock = mock.Mock()
-            headers_mock.dict = cern_ch_test_data['headers']
+            headers_mock.items.return_value = cern_ch_test_data['headers'].items()
             page.info.return_value = headers_mock
             mockObj.urlopen = mock.Mock(return_value=page)
-            assert self.detector.detect('http://cern.ch') == expected
+            results = self.detector.detect('http://cern.ch')
+            assert list(six.iterkeys(results)) == list(six.iterkeys(expected))
+            assert (sorted(next(six.itervalues(results)), key=operator.itemgetter('app')) ==
+                    sorted(next(six.itervalues(expected)), key=operator.itemgetter('app')))
 
     def test_detect_multiple(self):
         urls_list = ["http://cern.ch", None, "", "http://cern.ch", "example.com"]
         with mock.patch('wad.detection.Detector.detect') as mockObj:
             mockObj.side_effect = [{'test1': 1}, {'test2': 2}]
             assert self.detector.detect_multiple(urls_list) == {'test1': 1, 'test2': 2}
-            assert mockObj.call_args_list == [(('example.com', None, None, TIMEOUT),),
-                                              (('http://cern.ch', None, None, TIMEOUT),)]
+            assert (('example.com', None, None, TIMEOUT),) in mockObj.call_args_list
+            assert (('http://cern.ch', None, None, TIMEOUT),) in mockObj.call_args_list
