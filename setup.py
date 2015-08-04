@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 
 try:
     import pypandoc
-    long_description = pypandoc.convert('README.md', 'rst')
-    long_description += "\n\n" + pypandoc.convert('AUTHORS.md', 'rst')
+    long_description = pypandoc.convert('README.md', to='rst', format='md')
+    long_description += "\n\n" + pypandoc.convert('AUTHORS.md', to='rst', format='md')
 except (IOError, ImportError):
     long_description = ''
 
