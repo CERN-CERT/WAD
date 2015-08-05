@@ -24,6 +24,10 @@ Detection results may include information about versions of technologies used, f
 Results are categorized depending on type of technology (whether it is CMS or database etc.). There are now over 700 
 technologies that can be discovered using WAD.
 
+## Installation
+[WAD is available via PyPI](https://pypi.python.org/pypi/wad), so in order to install it, you simply need to run following command:  
+`pip install wad`
+
 ## Usage
 Use `wad -h` to print help text.
 JSON is used for convenient formatting of output data.
