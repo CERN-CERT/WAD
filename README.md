@@ -25,7 +25,8 @@ Results are categorized depending on type of technology (whether it is CMS or da
 technologies that can be discovered using WAD.
 
 ## Installation
-[WAD is available via PyPI](https://pypi.python.org/pypi/wad), so in order to install it, you simply need to run following command:  
+[WAD is available via PyPI](https://pypi.python.org/pypi/wad), so in order to install it, you simply need to run following command:
+
 `pip install wad`
 
 ## Usage
