@@ -247,6 +247,6 @@ class TestDetector(unittest.TestCase):
         results1 = self.detector.check_meta(content1)
         results2 = self.detector.check_meta(content2)
 
-        expected = [{u'app': 'GitLab CI', u'ver': None}]
+        expected = [{'app': 'GitLab CI', 'ver': None}]
 
         assert results1 == results2 == expected
