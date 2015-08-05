@@ -10,7 +10,10 @@ import re
 from wad import tools
 from wad.clues import Clues
 
-re_meta = re.compile('<meta[^>]+name\s*=\s*["\']([^"\']*)["\'][^>]+content\s*=\s*["\']([^"\']*)', re.IGNORECASE)
+# TODO: Switch to BeautifulSoup or lxml for HTML parsing purposes
+re_meta = re.compile('<meta[^>]+>', re.IGNORECASE)
+re_content = re.compile('content\s*=\s*[\'"]([^\'"]+)[\'"]', re.IGNORECASE)
+re_name = re.compile('name\s*=\s*[\'"]([^\'"]+)[\'"]', re.IGNORECASE)
 re_script = re.compile('<script[^>]+src\s*=\s*["\']([^"\']*)', re.IGNORECASE)
 
 TIMEOUT = 3
@@ -150,12 +153,20 @@ class Detector(object):
     def check_meta(self, content):
         found = []
         for tag in re_meta.finditer(content):
+            meta_tag = tag.group(0)
+            name_matches = re_name.findall(meta_tag)
+            content_matches = re_content.findall(meta_tag)
+            if not name_matches or not content_matches:
+                continue
+
+            name = name_matches[0]
+            content = content_matches[0]
             for app in self.apps:
                 if 'meta' in self.apps[app]:
                     for meta in self.apps[app]['meta']:
-                        if tag.group(1).lower() == meta.lower():
+                        if name.lower() == meta.lower():
                             self.check_re(self.apps[app]["meta_re"][meta], self.apps[app]['meta'][meta],
-                                          tag.group(2), found, 'meta(%s)' % meta, app)
+                                          content, found, 'meta(%s)' % meta, app)
 
         return found
 

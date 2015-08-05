@@ -237,3 +237,16 @@ class TestDetector(unittest.TestCase):
             assert self.detector.detect_multiple(urls_list) == {'test1': 1, 'test2': 2}
             assert (('example.com', None, None, TIMEOUT),) in mockObj.call_args_list
             assert (('http://cern.ch', None, None, TIMEOUT),) in mockObj.call_args_list
+
+    def test_regression_meta_attributes_order(self):
+        # This bug was caused by hardcoded attributes order in re_meta pattern.
+        # Example app that was affected was GitLab CI.
+        content1 = "<meta content='GitLab Continuous Integration' name='description'>"
+        content2 = "<meta name='description' content='GitLab Continuous Integration'>"
+
+        results1 = self.detector.check_meta(content1)
+        results2 = self.detector.check_meta(content2)
+
+        expected = [{'app': 'GitLab CI', 'ver': None}]
+
+        assert results1 == results2 == expected
