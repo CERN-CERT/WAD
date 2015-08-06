@@ -1,5 +1,5 @@
 # WAD - Web application detector
-[![Build Status](https://travis-ci.org/CERN-CERT/WAD.svg?branch=master)](https://travis-ci.org/CERN-CERT/WAD)
+[![Build Status](https://travis-ci.org/CERN-CERT/WAD.svg?branch=master)](https://travis-ci.org/CERN-CERT/WAD) [![PyPI](https://img.shields.io/pypi/v/wad.svg)](https://pypi.python.org/pypi/wad)
 
 WAD lets you analyze given URL(s) and detect technologies used by web application behind that URL, 
 from the OS and web server level, to the programming platform and frameworks, as well as server- and client-side
