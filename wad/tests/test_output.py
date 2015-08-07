@@ -19,8 +19,9 @@ class TestOutputs(unittest.TestCase):
         """
         We don't need to check exact output, just successful invocation, since functions only use native python libs
         """
-        JSONOutput().retrieve(results=self.input)
-        ConsolePrettyOutput().retrieve(results=self.input)
+        assert JSONOutput().retrieve(results=self.input) != ''
+        assert JSONOutput().retrieve(results=self.input, indent=None) != ''
+        assert ConsolePrettyOutput().retrieve(results=self.input) != ''
 
     def test_human_readable_output(self):
         expected_output = [

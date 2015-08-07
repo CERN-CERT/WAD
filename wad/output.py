@@ -15,9 +15,12 @@ class OutputFormat(object):
 
 class JSONOutput(OutputFormat):
     """
+    :param indent: optional integer specifying indentation of output
     :return: dict dumped to string in JSON format
     """
-    def retrieve(self, results):
+    def retrieve(self, results, indent=4):
+        if indent:
+            return json.dumps(results, indent=indent)
         return json.dumps(results)
 
 
