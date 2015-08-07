@@ -32,4 +32,4 @@ class TestOutputs(unittest.TestCase):
         ]
         results = six.StringIO(CSVOutput().retrieve(results=self.input)).readlines()
         results = [line.strip() for line in results]
-        self.assertSetEqual(set(expected_lines), set(results))
+        assert set(expected_lines) == set(results)

@@ -63,7 +63,8 @@ class CSVOutput(OutputFormat):
         fieldnames = ['URL', 'Finding', 'Version', 'Type']
         writer = csv.DictWriter(buf, fieldnames)
 
-        writer.writeheader()
+        # Can't use writeheader method, because it was introduced in python 2.7
+        writer.writerow(dict([(field, field) for field in fieldnames]))
         for url, data_dicts in six.iteritems(results):
             for data in data_dicts:
                 writer.writerow({'URL': url, 'Finding': data['app'], 'Version': data['ver'], 'Type': data['type']})
