@@ -32,13 +32,11 @@ class Detector(object):
         if not self.expected_url(url, limit, exclude):
             return {}
 
-        try:
-            page = tools.urlopen(url, timeout=timeout)
-            url = page.geturl()
-        except (six.moves.urllib.error.URLError, six.moves.http_client.HTTPException) as e:
-            # a network problem? page unavailable? wrong URL?
-            logging.warning("Error opening %s, terminating: %s", url, tools.error_to_str(e))
+        page = self.get_page(url=url, timeout=timeout)
+        if not page:
             return {}
+
+        url = self.get_new_url(page)
 
         if url != original_url:
             logging.info("` %s", url)
@@ -46,10 +44,8 @@ class Detector(object):
             if not self.expected_url(url, limit, exclude):
                 return {}
 
-        try:
-            content = page.read()
-        except (socket.timeout, six.moves.http_client.HTTPException, SSLError) as e:
-            logging.info("Exception while reading %s, terminating: %s", url, tools.error_to_str(e))
+        content = self.get_content(page, url)
+        if not content:
             return {}
 
         if six.PY3:
@@ -70,6 +66,14 @@ class Detector(object):
 
         return {url: findings}
 
+    def get_content(self, page, url):
+        try:
+            content = page.read()
+        except (socket.timeout, six.moves.http_client.HTTPException, SSLError) as e:
+            logging.info("Exception while reading %s, terminating: %s", url, tools.error_to_str(e))
+            return None
+        return content
+
     def detect_multiple(self, urls, limit=None, exclude=None, timeout=TIMEOUT):
         # remove duplicate URLs, remove empty URLs
         urls = list(set(urls) - set([None, ""]))
@@ -80,6 +84,18 @@ class Detector(object):
             results.update(res)
 
         return results
+
+    def get_page(self, url, timeout=TIMEOUT):
+        try:
+            page = tools.urlopen(url, timeout=timeout)
+        except (six.moves.urllib.error.URLError, six.moves.http_client.HTTPException) as e:
+            # a network problem? page unavailable? wrong URL?
+            logging.warning("Error opening %s, terminating: %s", url, tools.error_to_str(e))
+            return None
+        return page
+
+    def get_new_url(self, page):
+        return page.geturl()
 
     @staticmethod
     def check_re(re_compiled, re_raw, text, found, det, app, show_match_only=False):
