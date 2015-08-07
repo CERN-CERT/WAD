@@ -1,6 +1,8 @@
-import unittest
+from __future__ import absolute_import, division, print_function, unicode_literals
 import six
-from wad.output import JSONOutput, ConsolePrettyOutput, CSVOutput
+
+import unittest
+from wad.output import JSONOutput, ConsolePrettyOutput, CSVOutput, HumanReadableOutput
 
 
 class TestOutputs(unittest.TestCase):
@@ -21,7 +23,19 @@ class TestOutputs(unittest.TestCase):
         ConsolePrettyOutput().retrieve(results=self.input)
 
     def test_human_readable_output(self):
-        pass
+        expected_output = [
+            'Web application detection results',
+            'Results for website https://example1.com/, found applications:',
+            'Python (programming-languages), version: 2.7.6',
+            'jQuery (javascript-frameworks)',
+            'Results for website http://example2.com/, found applications:',
+            'Apache (web-servers), version: ABC',
+        ]
+        output = HumanReadableOutput().retrieve(self.input)
+        results = [line.strip() for line in six.StringIO(output).readlines()]
+        # Remove empty lines after stripping
+        results = [line for line in results if line != '']
+        assert set(expected_output) == set(results)
 
     def test_csv_output(self):
         expected_lines = [
@@ -30,6 +44,6 @@ class TestOutputs(unittest.TestCase):
             'https://example1.com/,Python,2.7.6,programming-languages',
             'https://example1.com/,jQuery,,javascript-frameworks'
         ]
-        results = six.StringIO(CSVOutput().retrieve(results=self.input)).readlines()
-        results = [line.strip() for line in results]
+        output = CSVOutput().retrieve(results=self.input)
+        results = [line.strip() for line in six.StringIO(output).readlines()]
         assert set(expected_lines) == set(results)

@@ -34,7 +34,18 @@ class HumanReadableOutput(OutputFormat):
     :return: string formatted to be easy to read
     """
     def retrieve(self, results):
-        pass
+        if not results:
+            return ''
+        output = 'Web application detection results\n'
+        for url, data_dicts in six.iteritems(results):
+            output += 'Results for website {url}, found applications:\n'.format(url=url)
+            for data in data_dicts:
+                output += '\t{app} ({type})'.format(app=data['app'], type=data['type'])
+                if data['ver']:
+                    output += ', version: {version}'.format(version=data['ver'])
+                output += '\n'
+            output += '\n'
+        return output
 
 
 class CSVOutput(OutputFormat):
