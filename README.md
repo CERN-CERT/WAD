@@ -53,3 +53,14 @@ Output:
     ]
 }
 ```
+
+## Differences between WAD and Wappalyzer
+Although most of the rules matching functionality is simply a Python port of Wappalyzer's javascript implementation, there are some key differences between projects.
+
+First of all, Wappalyzer (as an extension) runs on top of web browser, which means that the scripts on scanned site were ran, so variables and objects are created and accessible. 
+Unfortunately, this isn't and won't be a case for WAD. WAD parses raw site content (as delivered by HTTP response), without running it in browser context. 
+The consequences of that are simple - we can't use Wappalyzer's rules, that search for variables and objects in Javascript environment.
+
+Secondly, the project has and will continue to naturally diverge from Wappalyzer's codebase. We don't aim to make one-to-one port of Wappalyzer project and with intention to move to BeautifulSoup as DOM inspector (instead of blindly parsing the website with regex), we won't be able to assure same behaviour in every case. 
+
+Finally, additional features added into WAD project aren't ported into Wappalyzer at the same time.
