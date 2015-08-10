@@ -45,7 +45,7 @@ class Detector(object):
                 return {}
 
         content = self.get_content(page, url)
-        if not content:
+        if content is None:  # Empty content is empty string, so it will pass.
             return {}
 
         if six.PY3:
