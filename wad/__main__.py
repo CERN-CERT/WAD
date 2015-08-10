@@ -8,11 +8,16 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 from optparse import OptionParser
 
-import json
-
 from wad import tools
 from wad.clues import Clues, CLUES_FILE
 from wad.detection import TIMEOUT, Detector
+from wad.output import JSONOutput, CSVOutput, HumanReadableOutput
+
+output_format_map = {
+    'csv': CSVOutput,
+    'json': JSONOutput,
+    'txt': HumanReadableOutput,
+}
 
 
 def main(timeout=TIMEOUT):
@@ -48,6 +53,9 @@ etc."""
     parser.add_option("-t", "--timeout", action="store", dest="TIMEOUT", default=timeout,
                       help="set timeout (in seconds) for accessing a single URL")
 
+    parser.add_option("-f", "--format", action="store", dest="format", default='json',
+                      help="output format, allowed values: csv, txt, json (default)")
+
     tools.add_log_options(parser)
 
     options = parser.parse_args()[0]
@@ -72,14 +80,20 @@ etc."""
     else:
         urls = [x.strip() for x in options.urls.split(",") if x.strip() != ""]
 
+    if options.format not in output_format_map.keys():
+        parser.error("Invalid format specified")
+        return
+
     Clues.get_clues(options.clues_file)
 
     results = Detector().detect_multiple(urls, limit=options.limit, exclude=options.exclude, timeout=timeout)
 
+    output = output_format_map[options.format]().retrieve(results=results)
+
     if options.output_file:
         try:
             f = open(options.output_file, "w")
-            f.write(json.dumps(results))
+            f.write(output)
             f.close()
             logging.debug("Results written to file %s", options.output_file)
         except Exception as e:
@@ -87,8 +101,8 @@ etc."""
             logging.error("Error writing results to file %s, terminating: %s", options.output_file,
                           tools.error_to_str(e))
             return
-    else:
-        print(json.dumps(results, indent=4))
+
+    print(output)
 
 
 if __name__ == "__main__":
