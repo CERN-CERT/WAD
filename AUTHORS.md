@@ -1,3 +1,5 @@
+### Authors
+
 (Hopefully complete) list of people who contributed to this project:
 
   * Sebastian Łopieński
