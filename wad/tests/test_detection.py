@@ -193,24 +193,12 @@ class TestDetector(unittest.TestCase):
     def test_detect(self):
         expected = {
             'http://home.web.cern.ch/': [
-                {'app': 'Apache',
-                 'type': 'web-servers',
-                 'ver': None},
-                {'app': 'Drupal',
-                 'type': 'cms',
-                 'ver': '7'},
-                {'app': 'Lightbox',
-                 'type': 'photo-galleries,javascript-frameworks',
-                 'ver': None},
-                {'app': 'jQuery',
-                 'type': 'javascript-frameworks',
-                 'ver': None},
-                {'app': 'Google Font API',
-                 'type': 'font-scripts',
-                 'ver': None},
-                {'app': 'PHP',
-                 'type': 'programming-languages',
-                 'ver': None}
+                {'app': 'Apache', 'type': 'web-servers', 'ver': None},
+                {'app': 'Drupal', 'type': 'cms', 'ver': '7'},
+                {'app': 'Lightbox', 'type': 'photo-galleries,javascript-frameworks', 'ver': None},
+                {'app': 'jQuery', 'type': 'javascript-frameworks', 'ver': None},
+                {'app': 'Google Font API', 'type': 'font-scripts', 'ver': None},
+                {'app': 'PHP', 'type': 'programming-languages', 'ver': None}
             ]
         }
 
@@ -257,15 +245,9 @@ class TestDetector(unittest.TestCase):
         # headers etc.)
         expected = {
             'http://home.web.cern.ch/': [
-                {'app': 'Apache',
-                 'type': 'web-servers',
-                 'ver': None},
-                {'app': 'Drupal',
-                 'type': 'cms',
-                 'ver': '7'},
-                {'app': 'PHP',
-                 'type': 'programming-languages',
-                 'ver': None}
+                {'app': 'Apache', 'type': 'web-servers', 'ver': None},
+                {'app': 'Drupal', 'type': 'cms', 'ver': '7'},
+                {'app': 'PHP', 'type': 'programming-languages', 'ver': None}
             ]
         }
 
@@ -273,7 +255,7 @@ class TestDetector(unittest.TestCase):
             page = mock.Mock()
             page.geturl.return_value = cern_ch_test_data['geturl']
             if six.PY3:
-                page.read.return_value = bytes('')
+                page.read.return_value = bytes('', encoding='utf-8')
             else:
                 page.read.return_value = ''
             headers_mock = mock.Mock()
