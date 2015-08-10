@@ -193,24 +193,12 @@ class TestDetector(unittest.TestCase):
     def test_detect(self):
         expected = {
             'http://home.web.cern.ch/': [
-                {'app': 'Apache',
-                 'type': 'web-servers',
-                 'ver': None},
-                {'app': 'Drupal',
-                 'type': 'cms',
-                 'ver': '7'},
-                {'app': 'Lightbox',
-                 'type': 'photo-galleries,javascript-frameworks',
-                 'ver': None},
-                {'app': 'jQuery',
-                 'type': 'javascript-frameworks',
-                 'ver': None},
-                {'app': 'Google Font API',
-                 'type': 'font-scripts',
-                 'ver': None},
-                {'app': 'PHP',
-                 'type': 'programming-languages',
-                 'ver': None}
+                {'app': 'Apache', 'type': 'web-servers', 'ver': None},
+                {'app': 'Drupal', 'type': 'cms', 'ver': '7'},
+                {'app': 'Lightbox', 'type': 'photo-galleries,javascript-frameworks', 'ver': None},
+                {'app': 'jQuery', 'type': 'javascript-frameworks', 'ver': None},
+                {'app': 'Google Font API', 'type': 'font-scripts', 'ver': None},
+                {'app': 'PHP', 'type': 'programming-languages', 'ver': None}
             ]
         }
 
@@ -250,3 +238,31 @@ class TestDetector(unittest.TestCase):
         expected = [{'app': 'GitLab CI', 'ver': None}]
 
         assert results1 == results2 == expected
+
+    def test_regression_empty_content_should_run_checks(self):
+        # This bug was introduced while abstracting some methods in detect method of Detector
+        # Shortly, if the content was empty, code didn't run further (while it should, there might be something in
+        # headers etc.)
+        expected = {
+            'http://home.web.cern.ch/': [
+                {'app': 'Apache', 'type': 'web-servers', 'ver': None},
+                {'app': 'Drupal', 'type': 'cms', 'ver': '7'},
+                {'app': 'PHP', 'type': 'programming-languages', 'ver': None}
+            ]
+        }
+
+        with mock.patch('wad.detection.tools') as mockObj:
+            page = mock.Mock()
+            page.geturl.return_value = cern_ch_test_data['geturl']
+            if six.PY3:
+                page.read.return_value = bytes('', encoding='utf-8')
+            else:
+                page.read.return_value = ''
+            headers_mock = mock.Mock()
+            headers_mock.items.return_value = cern_ch_test_data['headers'].items()
+            page.info.return_value = headers_mock
+            mockObj.urlopen = mock.Mock(return_value=page)
+            results = self.detector.detect('http://cern.ch')
+            assert list(six.iterkeys(results)) == list(six.iterkeys(expected))
+            assert (sorted(next(six.itervalues(results)), key=operator.itemgetter('app')) ==
+                    sorted(next(six.itervalues(expected)), key=operator.itemgetter('app')))

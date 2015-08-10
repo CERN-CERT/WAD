@@ -45,7 +45,7 @@ class Detector(object):
                 return {}
 
         content = self.get_content(page, url)
-        if not content:
+        if content is None:  # Empty content is empty string, so it will pass.
             return {}
 
         if six.PY3:
@@ -66,14 +66,6 @@ class Detector(object):
 
         return {url: findings}
 
-    def get_content(self, page, url):
-        try:
-            content = page.read()
-        except (socket.timeout, six.moves.http_client.HTTPException, SSLError) as e:
-            logging.info("Exception while reading %s, terminating: %s", url, tools.error_to_str(e))
-            return None
-        return content
-
     def detect_multiple(self, urls, limit=None, exclude=None, timeout=TIMEOUT):
         # remove duplicate URLs, remove empty URLs
         urls = list(set(urls) - set([None, ""]))
@@ -84,6 +76,17 @@ class Detector(object):
             results.update(res)
 
         return results
+
+    def get_content(self, page, url):
+        """
+        :return: Content if present, None on handled exception
+        """
+        try:
+            content = page.read()
+        except (socket.timeout, six.moves.http_client.HTTPException, SSLError) as e:
+            logging.info("Exception while reading %s, terminating: %s", url, tools.error_to_str(e))
+            return None
+        return content
 
     def get_page(self, url, timeout=TIMEOUT):
         try:
