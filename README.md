@@ -64,3 +64,12 @@ The consequences of that are simple - we can't use Wappalyzer's rules, that sear
 Secondly, the project has and will continue to naturally diverge from Wappalyzer's codebase. We don't aim to make one-to-one port of Wappalyzer project and with intention to move to BeautifulSoup as DOM inspector (instead of blindly parsing the website with regex), we won't be able to assure same behaviour in every case. 
 
 Finally, additional features added into WAD project aren't ported into Wappalyzer at the same time.
+
+## Changelog
+### 0.2.0 (2015-08-10)
+
+**Implemented enhancements:**
+
+- Multiple output formats (added Human readable text, CSV)
+- Some methods extracted from Detector's detect method.
+- Minor bugfixes
