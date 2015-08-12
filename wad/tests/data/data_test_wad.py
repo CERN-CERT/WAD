@@ -216,3 +216,81 @@ cern_ch_test_data = {
         'X-Generator': 'Drupal 7 (http://drupal.org)'
     },
 }
+
+vinput = """
+{
+    "http://m.cern.ch": [
+        {
+            "type": "ws",
+            "app": "IIS",
+            "ver": "7.5"
+        },
+        {
+            "type": "os",
+            "app": "Windows Server",
+            "ver": null
+        },
+        {
+            "type": "web-frameworks",
+            "app": "Microsoft ASP.NET",
+            "ver": null
+        }
+    ],
+    "http://m.cern.ch/sub": [
+        {
+            "type": "os",
+            "app": "Windows Server",
+            "ver": null
+        },
+        {
+            "type": "web-frameworks",
+            "app": "Microsoft ASP.NET",
+            "ver": null
+        },
+        {
+            "type": "javascript-frameworks",
+            "app": "jQuery",
+            "ver": null
+        },
+        {
+            "type": "ws",
+            "app": "IIS",
+            "ver": "7"
+        }
+    ]
+}
+"""
+
+voutput = """
+{
+    "http://m.cern.ch": [
+        {
+            "type": "ws",
+            "app": "IIS",
+            "ver": "7.5"
+        },
+        {
+            "type": "os",
+            "app": "Windows Server",
+            "ver": null
+        },
+        {
+            "type": "web-frameworks",
+            "app": "Microsoft ASP.NET",
+            "ver": null
+        }
+    ],
+    "http://m.cern.ch/sub": [
+        {
+            "type": "javascript-frameworks",
+            "app": "jQuery",
+            "ver": null
+        },
+        {
+            "type": "ws",
+            "app": "IIS",
+            "ver": "7"
+        }
+    ]
+}
+"""
