@@ -11,7 +11,7 @@ def get_dir(url_path):
 
     normfilename = os.path.normpath(url_path)
     # /path/sub.dir/ -> /path/sub.dir
-    if url_path[-1] == "/":
+    if url_path.endswith("/"):
         return normfilename, False
 
     # /path/file.ext -> /path

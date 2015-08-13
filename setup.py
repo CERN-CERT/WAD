@@ -9,7 +9,7 @@ except (IOError, ImportError):
 
 setup(
     name='wad',
-    version='0.2.0',
+    version='0.3.0',
     description='A tool for detecting technologies used by web applications.',
     long_description=long_description,
     url='https://github.com/CERN-CERT/WAD',
