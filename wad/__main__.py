@@ -11,6 +11,7 @@ from optparse import OptionParser
 from wad import tools
 from wad.clues import Clues, CLUES_FILE
 from wad.detection import TIMEOUT, Detector
+from wad.group import group
 from wad.output import JSONOutput, CSVOutput, HumanReadableOutput
 
 output_format_map = {
@@ -56,6 +57,10 @@ etc."""
     parser.add_option("-f", "--format", action="store", dest="format", default='json',
                       help="output format, allowed values: csv, txt, json (default)")
 
+    parser.add_option("-g", "--group", action="store_true", dest="group", default=False,
+                      help="group results (i.e. technologies found on subpages of other scanned URL "
+                           "aren't listed)")
+
     tools.add_log_options(parser)
 
     options = parser.parse_args()[0]
@@ -87,6 +92,9 @@ etc."""
     Clues.get_clues(options.clues_file)
 
     results = Detector().detect_multiple(urls, limit=options.limit, exclude=options.exclude, timeout=timeout)
+
+    if options.group:
+        results = group(results)
 
     output = output_format_map[options.format]().retrieve(results=results)
 
