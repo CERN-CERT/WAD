@@ -1,6 +1,8 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 from wad.group import is_sub_url, group, get_dir
-from data.data_test_wad import vinput, voutput
+from wad.tests.data.data_test_wad import vinput, voutput
 
 
 def test_get_dir():
