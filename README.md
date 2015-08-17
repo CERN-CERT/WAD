@@ -65,7 +65,14 @@ Secondly, the project has and will continue to naturally diverge from Wappalyzer
 
 Finally, additional features added into WAD project aren't ported into Wappalyzer at the same time.
 
-## Changelog
+# Changelog
+### 0.3.1 (2015-08-17)
+
+**Implemented enhancements:**
+
+- Package should be thread-safe now
+- Minor changes to HumanReadableOutput
+
 ### 0.3.0 (2015-08-13)
 
 **Implemented enhancements:**

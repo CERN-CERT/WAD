@@ -39,15 +39,14 @@ class HumanReadableOutput(OutputFormat):
     def retrieve(self, results):
         if not results:
             return ''
-        output = 'Web application detection results\n'
+        output = ''
         for url, data_dicts in six.iteritems(results):
-            output += 'Results for website {url}, found applications:\n'.format(url=url)
+            output += 'Web application detection results for website {url}, found applications:\n'.format(url=url)
             for data in data_dicts:
                 output += '\t{app} ({type})'.format(app=data['app'], type=data['type'])
                 if data['ver']:
                     output += ', version: {version}'.format(version=data['ver'])
                 output += '\n'
-            output += '\n'
         return output
 
 

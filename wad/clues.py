@@ -5,6 +5,7 @@
 # detection:    https://github.com/AliasIO/Wappalyzer/blob/master/src/wappalyzer.js
 # JavaScript RegExp object: http://www.w3schools.com/jsref/jsref_obj_regexp.asp
 from __future__ import absolute_import, division, print_function, unicode_literals
+import threading
 import six
 
 import os
@@ -15,6 +16,7 @@ import json
 from wad import tools
 
 CLUES_FILE = os.path.join(os.path.dirname(__file__), 'etc/apps.json')
+clues_lock = threading.RLock()
 
 
 class _Clues(object):
@@ -23,12 +25,13 @@ class _Clues(object):
         self.categories = None
 
     def get_clues(self, filename=CLUES_FILE):
-        if self.apps and self.categories:
-            return self.apps, self.categories
+        with clues_lock:
+            if self.apps and self.categories:
+                return self.apps, self.categories
 
-        self.load_clues(filename)
-        self.compile_clues()
-        return self.apps, self.categories
+            self.load_clues(filename)
+            self.compile_clues()
+            return self.apps, self.categories
 
     @staticmethod
     def read_clues_from_file(filename):
