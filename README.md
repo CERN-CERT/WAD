@@ -66,22 +66,21 @@ Secondly, the project has and will continue to naturally diverge from Wappalyzer
 Finally, additional features added into WAD project aren't ported into Wappalyzer at the same time.
 
 ## Changelog
-### 0.3.1 (2015-08-17)
+### 0.3.2 (2015-08-17)
 
-**Implemented enhancements:**
+- Fixed bug causing detection of Perl if the website had Polish (.pl) top-level domain
+- Tests refactoring (duplicate code into method)
+
+### 0.3.1 (2015-08-17)
 
 - Package should be thread-safe now
 - Minor changes to HumanReadableOutput
 
 ### 0.3.0 (2015-08-13)
 
-**Implemented enhancements:**
-
 - Added results grouping functionality
 
 ### 0.2.0 (2015-08-10)
-
-**Implemented enhancements:**
 
 - Multiple output formats (added Human readable text, CSV)
 - Some methods extracted from Detector's detect method.

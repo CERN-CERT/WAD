@@ -44,6 +44,8 @@ class Detector(object):
             if not self.expected_url(url, limit, exclude):
                 return {}
 
+        url = self.normalize_url(url)
+
         content = self.get_content(page, url)
         if content is None:  # Empty content is empty string, so it will pass.
             return {}
@@ -99,6 +101,12 @@ class Detector(object):
 
     def get_new_url(self, page):
         return page.geturl()
+
+    def normalize_url(self, url):
+        path = ''.join(six.moves.urllib.parse.urlparse(url)[2:])
+        if path == '':  # ergo nothing follows top level domain
+            return url + '/'
+        return url
 
     @staticmethod
     def check_re(re_compiled, re_raw, text, found, det, app, show_match_only=False):
