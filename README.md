@@ -66,6 +66,10 @@ Secondly, the project has and will continue to naturally diverge from Wappalyzer
 Finally, additional features added into WAD project aren't ported into Wappalyzer at the same time.
 
 ## Changelog
+### 0.3.3 (2015-08-17)
+
+- Fixed bug causing crash on SSL certificate mismatch in Python >= 2.7.9
+
 ### 0.3.2 (2015-08-17)
 
 - Fixed bug causing detection of Perl if the website had Polish (.pl) top-level domain
