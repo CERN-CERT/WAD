@@ -28,10 +28,7 @@ def hash_id(x):
 def urlopen(url, timeout):
     headers = {'User-Agent': 'Mozilla/5.0 Firefox/33.0'}
     req = six.moves.urllib.request.Request(url, None, headers)
-    try:
-        page = six.moves.urllib.request.urlopen(req, timeout=timeout)
-    except TypeError:
-        page = six.moves.urllib.request.urlopen(req)
+    page = six.moves.urllib.request.urlopen(req, timeout=timeout)
     return page
 
 
