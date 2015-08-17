@@ -31,7 +31,7 @@ technologies that can be discovered using WAD.
 
 ## Usage
 Use `wad -h` to print help text.
-JSON is used for convenient formatting of output data.
+JSON is used by default for formatting output data, but you can also use other formats with -f <format> option.
 ### Example usage scenario
 Command: `wad -u https://pypi.python.org/` 
 
@@ -65,7 +65,7 @@ Secondly, the project has and will continue to naturally diverge from Wappalyzer
 
 Finally, additional features added into WAD project aren't ported into Wappalyzer at the same time.
 
-# Changelog
+## Changelog
 ### 0.3.1 (2015-08-17)
 
 **Implemented enhancements:**
