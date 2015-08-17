@@ -202,21 +202,26 @@ class TestDetector(unittest.TestCase):
             ]
         }
 
+        results = self.mock_detector_run(url=cern_ch_test_data['geturl'], content=cern_ch_test_data['content'],
+                                         headers=cern_ch_test_data['headers'].items())
+        assert list(six.iterkeys(results)) == list(six.iterkeys(expected))
+        assert (sorted(next(six.itervalues(results)), key=operator.itemgetter('app')) ==
+                sorted(next(six.itervalues(expected)), key=operator.itemgetter('app')))
+
+    def mock_detector_run(self, url='', content='', headers=None):
         with mock.patch('wad.detection.tools') as mockObj:
             page = mock.Mock()
-            page.geturl.return_value = cern_ch_test_data['geturl']
+            page.geturl.return_value = url
             if six.PY3:
-                page.read.return_value = bytes(cern_ch_test_data['content'], encoding='utf-8')
+                page.read.return_value = bytes(content, encoding='utf-8')
             else:
-                page.read.return_value = cern_ch_test_data['content']
+                page.read.return_value = content
             headers_mock = mock.Mock()
-            headers_mock.items.return_value = cern_ch_test_data['headers'].items()
+            headers_mock.items.return_value = headers or []
             page.info.return_value = headers_mock
             mockObj.urlopen = mock.Mock(return_value=page)
-            results = self.detector.detect('http://cern.ch')
-            assert list(six.iterkeys(results)) == list(six.iterkeys(expected))
-            assert (sorted(next(six.itervalues(results)), key=operator.itemgetter('app')) ==
-                    sorted(next(six.itervalues(expected)), key=operator.itemgetter('app')))
+            results = self.detector.detect('http://abc.xyz')
+        return results
 
     def test_detect_multiple(self):
         urls_list = ["http://cern.ch", None, "", "http://cern.ch", "example.com"]
@@ -250,19 +255,8 @@ class TestDetector(unittest.TestCase):
                 {'app': 'PHP', 'type': 'programming-languages', 'ver': None}
             ]
         }
-
-        with mock.patch('wad.detection.tools') as mockObj:
-            page = mock.Mock()
-            page.geturl.return_value = cern_ch_test_data['geturl']
-            if six.PY3:
-                page.read.return_value = bytes('', encoding='utf-8')
-            else:
-                page.read.return_value = ''
-            headers_mock = mock.Mock()
-            headers_mock.items.return_value = cern_ch_test_data['headers'].items()
-            page.info.return_value = headers_mock
-            mockObj.urlopen = mock.Mock(return_value=page)
-            results = self.detector.detect('http://cern.ch')
-            assert list(six.iterkeys(results)) == list(six.iterkeys(expected))
-            assert (sorted(next(six.itervalues(results)), key=operator.itemgetter('app')) ==
-                    sorted(next(six.itervalues(expected)), key=operator.itemgetter('app')))
+        results = self.mock_detector_run(url=cern_ch_test_data['geturl'], content='',
+                                         headers=cern_ch_test_data['headers'].items())
+        assert list(six.iterkeys(results)) == list(six.iterkeys(expected))
+        assert (sorted(next(six.itervalues(results)), key=operator.itemgetter('app')) ==
+                sorted(next(six.itervalues(expected)), key=operator.itemgetter('app')))
