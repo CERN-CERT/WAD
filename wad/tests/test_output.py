@@ -25,11 +25,10 @@ class TestOutputs(unittest.TestCase):
 
     def test_human_readable_output(self):
         expected_output = [
-            'Web application detection results',
-            'Results for website https://example1.com/, found applications:',
+            'Web application detection results for website https://example1.com/, found applications:',
             'Python (programming-languages), version: 2.7.6',
             'jQuery (javascript-frameworks)',
-            'Results for website http://example2.com/, found applications:',
+            'Web application detection results for website http://example2.com/, found applications:',
             'Apache (web-servers), version: ABC',
         ]
         output = HumanReadableOutput().retrieve(self.input)
