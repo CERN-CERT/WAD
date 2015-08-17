@@ -7,6 +7,7 @@ import six
 from hashlib import md5
 import logging
 import sys
+import ssl
 
 
 def count(d, e):
@@ -28,7 +29,10 @@ def hash_id(x):
 def urlopen(url, timeout):
     headers = {'User-Agent': 'Mozilla/5.0 Firefox/33.0'}
     req = six.moves.urllib.request.Request(url, None, headers)
-    page = six.moves.urllib.request.urlopen(req, timeout=timeout)
+    if sys.version_info >= (2, 7, 9):
+        page = six.moves.urllib.request.urlopen(req, timeout=timeout, context=ssl._create_unverified_context())
+    else:
+        page = six.moves.urllib.request.urlopen(req, timeout=timeout)
     return page
 
 
