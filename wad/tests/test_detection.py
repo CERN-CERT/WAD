@@ -16,6 +16,21 @@ class TestDetector(unittest.TestCase):
         self.apps = self.detector.apps
         self.categories = self.detector.categories
 
+    def mock_detector_run(self, url='', content='', headers=None):
+        with mock.patch('wad.detection.tools') as mockObj:
+            page = mock.Mock()
+            page.geturl.return_value = url
+            if six.PY3:
+                page.read.return_value = bytes(content, encoding='utf-8')
+            else:
+                page.read.return_value = content
+            headers_mock = mock.Mock()
+            headers_mock.items.return_value = headers or []
+            page.info.return_value = headers_mock
+            mockObj.urlopen = mock.Mock(return_value=page)
+            results = self.detector.detect('http://abc.xyz')
+        return results
+
     def test_check_re(self):
         # checking version patterns:
         #
@@ -202,21 +217,11 @@ class TestDetector(unittest.TestCase):
             ]
         }
 
-        with mock.patch('wad.detection.tools') as mockObj:
-            page = mock.Mock()
-            page.geturl.return_value = cern_ch_test_data['geturl']
-            if six.PY3:
-                page.read.return_value = bytes(cern_ch_test_data['content'], encoding='utf-8')
-            else:
-                page.read.return_value = cern_ch_test_data['content']
-            headers_mock = mock.Mock()
-            headers_mock.items.return_value = cern_ch_test_data['headers'].items()
-            page.info.return_value = headers_mock
-            mockObj.urlopen = mock.Mock(return_value=page)
-            results = self.detector.detect('http://cern.ch')
-            assert list(six.iterkeys(results)) == list(six.iterkeys(expected))
-            assert (sorted(next(six.itervalues(results)), key=operator.itemgetter('app')) ==
-                    sorted(next(six.itervalues(expected)), key=operator.itemgetter('app')))
+        results = self.mock_detector_run(url=cern_ch_test_data['geturl'], content=cern_ch_test_data['content'],
+                                         headers=cern_ch_test_data['headers'].items())
+        assert list(six.iterkeys(results)) == list(six.iterkeys(expected))
+        assert (sorted(next(six.itervalues(results)), key=operator.itemgetter('app')) ==
+                sorted(next(six.itervalues(expected)), key=operator.itemgetter('app')))
 
     def test_detect_multiple(self):
         urls_list = ["http://cern.ch", None, "", "http://cern.ch", "example.com"]
@@ -225,6 +230,11 @@ class TestDetector(unittest.TestCase):
             assert self.detector.detect_multiple(urls_list) == {'test1': 1, 'test2': 2}
             assert (('example.com', None, None, TIMEOUT),) in mockObj.call_args_list
             assert (('http://cern.ch', None, None, TIMEOUT),) in mockObj.call_args_list
+
+    def test_normalize_url(self):
+        assert self.detector.normalize_url('http://abc.pl') == 'http://abc.pl/'
+        assert self.detector.normalize_url('http://abc.pl/') == 'http://abc.pl/'
+        assert self.detector.normalize_url('http://abc.pl/def') == 'http://abc.pl/def'
 
     def test_regression_meta_attributes_order(self):
         # This bug was caused by hardcoded attributes order in re_meta pattern.
@@ -250,19 +260,15 @@ class TestDetector(unittest.TestCase):
                 {'app': 'PHP', 'type': 'programming-languages', 'ver': None}
             ]
         }
+        results = self.mock_detector_run(url=cern_ch_test_data['geturl'], content='',
+                                         headers=cern_ch_test_data['headers'].items())
+        assert list(six.iterkeys(results)) == list(six.iterkeys(expected))
+        assert (sorted(next(six.itervalues(results)), key=operator.itemgetter('app')) ==
+                sorted(next(six.itervalues(expected)), key=operator.itemgetter('app')))
 
-        with mock.patch('wad.detection.tools') as mockObj:
-            page = mock.Mock()
-            page.geturl.return_value = cern_ch_test_data['geturl']
-            if six.PY3:
-                page.read.return_value = bytes('', encoding='utf-8')
-            else:
-                page.read.return_value = ''
-            headers_mock = mock.Mock()
-            headers_mock.items.return_value = cern_ch_test_data['headers'].items()
-            page.info.return_value = headers_mock
-            mockObj.urlopen = mock.Mock(return_value=page)
-            results = self.detector.detect('http://cern.ch')
-            assert list(six.iterkeys(results)) == list(six.iterkeys(expected))
-            assert (sorted(next(six.itervalues(results)), key=operator.itemgetter('app')) ==
-                    sorted(next(six.itervalues(expected)), key=operator.itemgetter('app')))
+    def test_regression_urls_not_normalized(self):
+        # This bug caused .pl top level domain to be recognized as Perl file.
+        # It is due to the fact, that Wappalyzer receives normalized URI from browser ("http://abc.xyz/")
+        # even if you open "http://abc.xyz", while we didn't normalize the URL.
+        results = self.mock_detector_run(url='http://abc.pl')
+        assert results == {'http://abc.pl/': []}
