@@ -60,6 +60,7 @@ class Detector(object):
             findings += self.check_meta(content)  # 'meta'
             findings += self.check_script(content)  # 'script'
             findings += self.check_html(content)  # 'html'
+        findings += self.additional_checks(page, url, content)
 
         self.follow_implies(findings)  # 'implies'
         self.remove_duplicates(findings)
@@ -287,3 +288,13 @@ class Detector(object):
             logging.warning("x %s =~ %s", url, exclude)
             return False
         return True
+
+    def additional_checks(self, page, url, content):
+        """
+        It can be overrided in order to perform more checks over the website
+        :param page: page retrieved with urllib2
+        :param url: page url
+        :param content: decoded content
+        :return: list of findings
+        """
+        return []
