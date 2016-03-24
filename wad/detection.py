@@ -26,7 +26,6 @@ class Detector(object):
     def detect(self, url, limit=None, exclude=None, timeout=TIMEOUT):
         logging.info("- %s", url)
 
-        findings = []
         original_url = url
 
         if not self.expected_url(url, limit, exclude):
@@ -53,21 +52,27 @@ class Detector(object):
         if six.PY3:
             content = content.decode()
 
+        findings = self.additional_checks(page, url, content)
+        extra_findings = self.findings(url, page.info(), content)
+
+        return {url: findings + extra_findings}
+
+    def findings(self, url, headers, content):
+        findings = []
         findings += self.check_url(url)  # 'url'
-        if page:
-            findings += self.check_headers(page.info())  # 'headers'
+        if headers:
+            findings += self.check_headers(headers)  # 'headers'
         if content:
             findings += self.check_meta(content)  # 'meta'
             findings += self.check_script(content)  # 'script'
             findings += self.check_html(content)  # 'html'
-        findings += self.additional_checks(page, url, content)
 
         self.follow_implies(findings)  # 'implies'
         self.remove_duplicates(findings)
         self.remove_exclusions(findings)  # 'excludes'
         self.add_categories(findings)
 
-        return {url: findings}
+        return findings
 
     def detect_multiple(self, urls, limit=None, exclude=None, timeout=TIMEOUT):
         # remove duplicate URLs, remove empty URLs
