@@ -16,7 +16,7 @@ import json
 
 from wad import tools
 
-CLUES_FILE = os.path.join(os.path.dirname(__file__), 'etc/apps.json')
+CLUES_FILE_PATHS = [os.path.join(os.path.dirname(__file__), 'etc/apps.json'), '/etc/wad/apps.json']
 clues_lock = threading.RLock()
 
 
@@ -25,11 +25,16 @@ class _Clues(object):
         self.apps = None
         self.categories = None
 
-    def get_clues(self, filename=CLUES_FILE):
+    def get_clues(self, filename=None):
         with clues_lock:
             if self.apps and self.categories:
                 return self.apps, self.categories
 
+            if filename is None:
+                for clues_path in CLUES_FILE_PATHS:
+                    if os.path.isfile(clues_path):
+                        filename = clues_path
+                        break
             self.load_clues(filename)
             self.compile_clues()
             return self.apps, self.categories
