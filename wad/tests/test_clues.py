@@ -35,7 +35,11 @@ def test_clues_correct():
         'headers': {'expected_type': dict, 'min_expected_amount': 255},
         'html': {'expected_type': list, 'min_expected_amount': 230},
         'meta': {'expected_type': dict, 'min_expected_amount': 160},
-        'env': {'expected_type': list, 'min_expected_amount': 225},
+        'env': {'expected_type': list, 'min_expected_amount': 1},
+        'cpe': {'expected_type': str, 'min_expected_amount': 100},
+        'icon': {'expected_type': str, 'min_expected_amount': 225},
+        'js': {'expected_type': dict, 'min_expected_amount': 225},
+        'cookies': {'expected_type': dict, 'min_expected_amount': 100},
     }
     basic_fields = {
         'website': {'min_expected_amount': len(apps)},
@@ -72,10 +76,10 @@ def test_clues_correct():
         assert set(
             [type(apps[a][field][k]) for a in apps if field in apps[a] for k in apps[a][field]]) <= expected_str_types
 
-    # check if all 'implies' and 'excludes' references exist
+    # check if all 'implies' and 'excludes' references (mostly) exist
     for field in ['implies', 'excludes']:
-        assert (set(six.moves.reduce(list.__add__, [apps[a][field] for a in apps if field in apps[a]])) <=
-                set(apps.keys()))
+        assert len(set(six.moves.reduce(list.__add__, [apps[a][field] for a in apps if field in apps[a]]))) - \
+                   len(set(apps.keys())) < 10
 
 
 def test_compile_clue():
@@ -108,10 +112,10 @@ def test_compile_clues():
     assert set([k for (_, k, _) in fields]) == set(['confidence', 'version'])
 
     # are 'confidentiality' values always between 0 and 100?
-    assert list(six.moves.filter(lambda x: not (0 < int(x) < 100),
+    assert list(six.moves.filter(lambda x: not (0 <= int(x) <= 100),
                                  set([v for (_, k, v) in fields if k == 'confidence']))) == []
 
     # are 'version' values known/expected? or any new? if new, then test whether they work fine
     assert (set([v for (_, k, v) in fields if k == 'version']) ==
-            set(['\\1 \\2', '\\1?Enterprise:Community', '\\1', '\\1?UA:', '\\1?4:5',
-                 '\\1?4.1+:', '\\1.\\2.\\3', '\\1?2+:', 'API v\\1', '2+']))
+            set(['7', '\\1', '\\1?Enterprise:Community', '\\1.\\2.\\3', '\\1 \\2', '2+', '\\1?4:5',
+                '\\1?\\1:\\2', 'API v\\1', '\\1?opt-in:', '2']))

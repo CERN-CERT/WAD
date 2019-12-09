@@ -11,6 +11,7 @@ import six
 import os
 import logging
 import re
+import sre_constants
 import json
 
 from wad import tools
@@ -49,7 +50,7 @@ class _Clues(object):
             raise
 
         json_data.close()
-        categories = clues['categories']
+        categories = dict((k, v['name']) for k, v in six.iteritems(clues['categories']))
         apps = clues['apps']
         return apps, categories
 
@@ -119,13 +120,18 @@ class _Clues(object):
         # compiling regular expressions
         for app in self.apps:
             regexps = {}
-            for key in self.apps[app]:
+            for key in list(self.apps[app]):
                 if key in ['script', 'html', 'url']:
-                    regexps[key + "_re"] = list(six.moves.map(self.compile_clue, self.apps[app][key]))
+                    try:
+                        regexps[key + "_re"] = list(six.moves.map(self.compile_clue, self.apps[app][key]))
+                    except sre_constants.error:
+                        del self.apps[app][key]
                 if key in ['meta', 'headers']:
-                    regexps[key + "_re"] = {}
-                    for entry in self.apps[app][key]:
-                        regexps[key + "_re"][entry] = self.compile_clue(self.apps[app][key][entry])
+                    try:
+                        regexps[key + "_re"] = dict((entry, self.compile_clue(self.apps[app][key][entry]))
+                                                    for entry in self.apps[app][key])
+                    except sre_constants.error:
+                        del self.apps[app][key]
             self.apps[app].update(regexps)
 
 
