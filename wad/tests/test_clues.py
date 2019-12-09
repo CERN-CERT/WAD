@@ -36,8 +36,8 @@ def test_clues_correct():
         'html': {'expected_type': list, 'min_expected_amount': 230},
         'meta': {'expected_type': dict, 'min_expected_amount': 160},
         'env': {'expected_type': list, 'min_expected_amount': 1},
-        'cpe': {'expected_type': str, 'min_expected_amount': 100},
-        'icon': {'expected_type': str, 'min_expected_amount': 225},
+        'cpe': {'expected_type': six.text_type, 'min_expected_amount': 100},
+        'icon': {'expected_type': six.text_type, 'min_expected_amount': 225},
         'js': {'expected_type': dict, 'min_expected_amount': 225},
         'cookies': {'expected_type': dict, 'min_expected_amount': 100},
     }
@@ -83,10 +83,10 @@ def test_clues_correct():
 
 
 def test_compile_clue():
-    assert _Clues.compile_clue("abc") == {"re": re.compile("abc", flags=re.I)}
-    assert _Clues.compile_clue("abc\;version:$1") == {"re": re.compile("abc", flags=re.I), "version": "$1"}
-    assert _Clues.compile_clue("ab;c\;k:v1:v2\;aaa") == {"re": re.compile("ab;c", flags=re.I),
-                                                         "k": "v1:v2", "aaa": None}
+    assert _Clues.compile_clue('abc') == {"re": re.compile("abc", flags=re.I)}
+    assert _Clues.compile_clue(r'abc\;version:$1') == {"re": re.compile("abc", flags=re.I), "version": "$1"}
+    assert _Clues.compile_clue(r'ab;c\;k:v1:v2\;aaa') == {"re": re.compile("ab;c", flags=re.I),
+                                                           "k": "v1:v2", "aaa": None}
 
 
 def test_compile_clues():

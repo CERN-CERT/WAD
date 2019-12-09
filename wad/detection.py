@@ -11,10 +11,10 @@ from wad import tools
 from wad.clues import Clues
 
 # TODO: Switch to BeautifulSoup or lxml for HTML parsing purposes
-re_meta = re.compile('<meta[^>]+>', re.IGNORECASE)
-re_content = re.compile('content\s*=\s*[\'"]([^\'"]+)[\'"]', re.IGNORECASE)
-re_name = re.compile('name\s*=\s*[\'"]([^\'"]+)[\'"]', re.IGNORECASE)
-re_script = re.compile('<script[^>]+src\s*=\s*["\']([^"\']*)', re.IGNORECASE)
+re_meta = re.compile(r'<meta[^>]+>', re.IGNORECASE)
+re_content = re.compile(r'content\s*=\s*[\'"]([^\'"]+)[\'"]', re.IGNORECASE)
+re_name = re.compile(r'name\s*=\s*[\'"]([^\'"]+)[\'"]', re.IGNORECASE)
+re_script = re.compile(r'<script[^>]+src\s*=\s*["\']([^"\']*)', re.IGNORECASE)
 
 TIMEOUT = 3
 

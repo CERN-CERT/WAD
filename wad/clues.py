@@ -73,7 +73,7 @@ class _Clues(object):
             if tag in self.apps[app]:
                 new_list = []
                 for item in self.apps[app][tag]:
-                    values = item.split("\;")
+                    values = item.split(r'\;')
                     new_list += [values[0]]
                 self.apps[app][tag] = new_list
 
@@ -105,7 +105,7 @@ class _Clues(object):
 
     @staticmethod
     def compile_clue(regexp_extended):
-        values = regexp_extended.split("\;")
+        values = regexp_extended.split(r'\;')
         regex_dict = {"re": re.compile(values[0], flags=re.IGNORECASE)}
         for extra_field in values[1:]:
             try:
