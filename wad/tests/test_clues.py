@@ -72,7 +72,7 @@ def test_clues_correct():
         assert set([type(apps[a][field]) for a in apps if field in apps[a]]) <= set([field_dict['expected_type']])
         assert set([type(v) for a in apps if field in apps[a] for v in apps[a][field]]) <= expected_str_types
 
-    for field in ['headers', 'meta']:
+    for field in ['headers', 'meta', 'js', 'cookies']:
         assert set(
             [type(apps[a][field][k]) for a in apps if field in apps[a] for k in apps[a][field]]) <= expected_str_types
 
@@ -101,7 +101,7 @@ def test_compile_clues():
         for key in apps[app]:
             if key in ['script', 'html', 'url']:
                 fields += six.moves.reduce(list.__add__, get_fields(app, key, list(enumerate(apps[app][key + '_re']))))
-            if key in ['meta', 'headers']:
+            if key in ['meta', 'headers', 'js', 'cookies']:
                 fields += six.moves.reduce(list.__add__,
                                            get_fields(app, key,
                                                       [item for item in six.iteritems(apps[app][key + '_re'])]))
@@ -118,4 +118,4 @@ def test_compile_clues():
     # are 'version' values known/expected? or any new? if new, then test whether they work fine
     assert (set([v for (_, k, v) in fields if k == 'version']) ==
             set(['7', '\\1', '\\1?Enterprise:Community', '\\1.\\2.\\3', '\\1 \\2', '2+', '\\1?4:5',
-                '\\1?\\1:\\2', 'API v\\1', '\\1?opt-in:', '2']))
+                '\\1?\\1:\\2', 'API v\\1', '\\1?opt-in:', '2', '\\1?2+:']))

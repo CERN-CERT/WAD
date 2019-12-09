@@ -56,6 +56,7 @@ class Detector(object):
         findings += self.check_url(url)  # 'url'
         if page:
             findings += self.check_headers(page.info())  # 'headers'
+            findings += self.check_cookies(page.info())  # 'cookies'
         if content:
             findings += self.check_meta(content)  # 'meta'
             findings += self.check_script(content)  # 'script'
@@ -209,6 +210,27 @@ class Detector(object):
                     if entry.lower() in headers:
                         self.check_re(self.apps[app]['headers_re'][entry], self.apps[app]['headers'][entry],
                                       headers[entry.lower()], found, 'headers(%s)' % entry, app)
+        return found
+
+    def check_cookies(self, headers):
+        cookies = dict()
+        for cookie in headers.get('Set-Cookie', '').split(';'):
+            if '=' in cookie:
+                sep = cookie.index('=')
+                cookie_name = cookie[:sep].strip()
+                cookie_val = cookie[sep+1:].strip()
+                cookies[cookie_name] = cookie_val
+
+        if not cookies:
+            return []
+
+        found = []
+        for app in self.apps:
+            if 'cookies' in self.apps[app]:
+                for entry in self.apps[app]['cookies']:
+                    if entry in cookies:
+                        self.check_re(self.apps[app]['cookies_re'][entry], self.apps[app]['cookies'][entry],
+                                      cookies[entry], found, 'cookies(%s)' % entry, app)
         return found
 
     def implied_by(self, app_list):

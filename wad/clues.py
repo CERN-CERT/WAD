@@ -126,7 +126,7 @@ class _Clues(object):
                         regexps[key + "_re"] = list(six.moves.map(self.compile_clue, self.apps[app][key]))
                     except sre_constants.error:
                         del self.apps[app][key]
-                if key in ['meta', 'headers']:
+                if key in ['meta', 'headers', 'js', 'cookies']:
                     try:
                         regexps[key + "_re"] = dict((entry, self.compile_clue(self.apps[app][key][entry]))
                                                     for entry in self.apps[app][key])
