@@ -135,11 +135,12 @@ class Detector(object):
                 try:
                     ternary = re.match(r"^(.*)\?(.*):(.*)$", version_pattern)
                     if ternary:
+                        ver = ternary.group(3)
                         try:
-                            match.expand(ternary.group(1))
-                            ver = ternary.group(2)
+                            if match.expand(ternary.group(1)):
+                                ver = ternary.group(2)
                         except Exception:
-                            ver = ternary.group(3)
+                            pass
                     else:
                         ver = match.expand(version_pattern)
                 except Exception as e:
@@ -152,7 +153,7 @@ class Detector(object):
 
             logging.info("  + %-7s -> %s (%s): %s =~ %s", det, app, ver, show_text, re_raw)
 
-            res = [{'app': str(app), 'ver': ver}]
+            res = [{'app': str(app), 'ver': ver or None}]
             found += res
 
         return res

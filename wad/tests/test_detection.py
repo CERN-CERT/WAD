@@ -202,8 +202,8 @@ class TestDetector(unittest.TestCase):
         assert not self.detector.expected_url(url, 'http://abc.com/', None)
         assert self.detector.expected_url(url, 'http://.*abc.com/', "php")
         assert not self.detector.expected_url(url, 'http://.*abc.com/', ".*php")
-        assert self.detector.expected_url(url, None, ".*\.asp")
-        assert not self.detector.expected_url(url, None, ".*\.php")
+        assert self.detector.expected_url(url, None, ".*\\.asp")
+        assert not self.detector.expected_url(url, None, ".*\\.php")
 
     def test_detect(self):
         expected = {
