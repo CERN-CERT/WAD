@@ -11,11 +11,12 @@ import six
 import os
 import logging
 import re
+import sre_constants
 import json
 
 from wad import tools
 
-CLUES_FILE = os.path.join(os.path.dirname(__file__), 'etc/apps.json')
+CLUES_FILE_PATHS = [os.path.join(os.path.dirname(__file__), 'etc/apps.json'), '/etc/wad/apps.json']
 clues_lock = threading.RLock()
 
 
@@ -24,11 +25,16 @@ class _Clues(object):
         self.apps = None
         self.categories = None
 
-    def get_clues(self, filename=CLUES_FILE):
+    def get_clues(self, filename=None):
         with clues_lock:
             if self.apps and self.categories:
                 return self.apps, self.categories
 
+            if filename is None:
+                for clues_path in CLUES_FILE_PATHS:
+                    if os.path.isfile(clues_path):
+                        filename = clues_path
+                        break
             self.load_clues(filename)
             self.compile_clues()
             return self.apps, self.categories
@@ -49,7 +55,7 @@ class _Clues(object):
             raise
 
         json_data.close()
-        categories = clues['categories']
+        categories = dict((k, v['name']) for k, v in six.iteritems(clues['categories']))
         apps = clues['apps']
         return apps, categories
 
@@ -72,7 +78,7 @@ class _Clues(object):
             if tag in self.apps[app]:
                 new_list = []
                 for item in self.apps[app][tag]:
-                    values = item.split("\;")
+                    values = item.split(r'\;')
                     new_list += [values[0]]
                 self.apps[app][tag] = new_list
 
@@ -104,7 +110,7 @@ class _Clues(object):
 
     @staticmethod
     def compile_clue(regexp_extended):
-        values = regexp_extended.split("\;")
+        values = regexp_extended.split(r'\;')
         regex_dict = {"re": re.compile(values[0], flags=re.IGNORECASE)}
         for extra_field in values[1:]:
             try:
@@ -119,13 +125,18 @@ class _Clues(object):
         # compiling regular expressions
         for app in self.apps:
             regexps = {}
-            for key in self.apps[app]:
+            for key in list(self.apps[app]):
                 if key in ['script', 'html', 'url']:
-                    regexps[key + "_re"] = list(six.moves.map(self.compile_clue, self.apps[app][key]))
-                if key in ['meta', 'headers']:
-                    regexps[key + "_re"] = {}
-                    for entry in self.apps[app][key]:
-                        regexps[key + "_re"][entry] = self.compile_clue(self.apps[app][key][entry])
+                    try:
+                        regexps[key + "_re"] = list(six.moves.map(self.compile_clue, self.apps[app][key]))
+                    except sre_constants.error:
+                        del self.apps[app][key]
+                if key in ['meta', 'headers', 'js', 'cookies']:
+                    try:
+                        regexps[key + "_re"] = dict((entry, self.compile_clue(self.apps[app][key][entry]))
+                                                    for entry in self.apps[app][key])
+                    except sre_constants.error:
+                        del self.apps[app][key]
             self.apps[app].update(regexps)
 
 

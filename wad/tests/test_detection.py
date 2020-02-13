@@ -18,15 +18,13 @@ class TestDetector(unittest.TestCase):
 
     def mock_detector_run(self, url='', content='', headers=None):
         with mock.patch('wad.detection.tools') as mockObj:
-            page = mock.Mock()
+            page = mock.MagicMock()
             page.geturl.return_value = url
             if six.PY3:
                 page.read.return_value = bytes(content, encoding='utf-8')
             else:
                 page.read.return_value = content
-            headers_mock = mock.Mock()
-            headers_mock.items.return_value = headers or []
-            page.info.return_value = headers_mock
+            page.info.return_value = headers or dict()
             mockObj.urlopen = mock.Mock(return_value=page)
             results = self.detector.detect('http://abc.xyz')
         return results
@@ -98,6 +96,12 @@ class TestDetector(unittest.TestCase):
         assert (self.detector.check_headers(headers_mock) ==
                 [{'app': 'Ubuntu', 'ver': None}])
 
+    def test_check_cookies(self):
+        headers = {'Set-Cookie': 'x=1; xid=%s; y=2' % ('a'*32)}
+
+        assert (self.detector.check_cookies(headers) ==
+                [{'app': 'X-Cart', 'ver': None}])
+
     def test_implied_by(self):
         # ASP implies WS and IIS and IIS implies WS;
         # but we already know about IIS, so the only new implied app is WS
@@ -145,10 +149,10 @@ class TestDetector(unittest.TestCase):
         assert with_duplicates == without_duplicates
 
     def test_excluded_by(self):
-        # both 'TYPO3 Flow' and 'TYPO3 Neos' exclude 'TYPO3 CMS'
-        assert self.detector.excluded_by(['TYPO3 Flow', 'TYPO3 Neos']) == ['TYPO3 CMS']
+        # both 'Neos Flow' and 'Neos CMS' exclude 'TYPO3 CMS'
+        assert self.detector.excluded_by(['Neos Flow', 'Neos CMS']) == ['TYPO3 CMS']
         # 'JBoss Web' excludes 'Apache Tomcat'; 'Mambo' excludes 'Joomla'
-        assert set(self.detector.excluded_by(['Jo', 'JBoss Web', 'Jetty', 'Mambo'])) == set(['Joomla', 'Apache Tomcat'])
+        assert set(self.detector.excluded_by(['JBoss Web', 'Jetty', 'Mambo'])) == set(['Joomla', 'Apache Tomcat'])
         # 'IIS' doesn't exclude anything
         assert self.detector.excluded_by(['IIS']) == []
 
@@ -168,12 +172,12 @@ class TestDetector(unittest.TestCase):
                     {'app': 'Apache Tomcat', 'ver': None},
                     {'app': 'IIS', 'ver': None},
                     {'app': 'TYPO3 CMS', 'ver': None},
-                    {'app': 'TYPO3 Flow', 'ver': None}]
+                    {'app': 'Neos Flow', 'ver': None}]
         self.detector.remove_exclusions(findings)
         assert (findings ==
                 [{'app': 'JBoss Web', 'ver': None},
                  {'app': 'IIS', 'ver': None},
-                 {'app': 'TYPO3 Flow', 'ver': None}])
+                 {'app': 'Neos Flow', 'ver': None}])
 
     def test_add_categories(self):
         findings = [
@@ -182,10 +186,10 @@ class TestDetector(unittest.TestCase):
             {'app': 'Python', 'ver': '2.7'},
             {'app': 'Dynamicweb', 'ver': 'beta'}]
         original = copy.deepcopy(findings)
-        original[0]["type"] = "cms"
-        original[1]["type"] = "web-frameworks"
-        original[2]["type"] = "programming-languages"
-        original[3]["type"] = "cms,ecommerce,analytics"
+        original[0]["type"] = "CMS"
+        original[1]["type"] = "Web Application Frameworks"
+        original[2]["type"] = "Programming Languages"
+        original[3]["type"] = "CMS,Ecommerce,Analytics"
 
         self.detector.add_categories(findings)
         assert original == findings
@@ -202,23 +206,23 @@ class TestDetector(unittest.TestCase):
         assert not self.detector.expected_url(url, 'http://abc.com/', None)
         assert self.detector.expected_url(url, 'http://.*abc.com/', "php")
         assert not self.detector.expected_url(url, 'http://.*abc.com/', ".*php")
-        assert self.detector.expected_url(url, None, ".*\.asp")
-        assert not self.detector.expected_url(url, None, ".*\.php")
+        assert self.detector.expected_url(url, None, ".*\\.asp")
+        assert not self.detector.expected_url(url, None, ".*\\.php")
 
     def test_detect(self):
         expected = {
             'http://home.web.cern.ch/': [
-                {'app': 'Apache', 'type': 'web-servers', 'ver': None},
-                {'app': 'Drupal', 'type': 'cms', 'ver': '7'},
-                {'app': 'Lightbox', 'type': 'photo-galleries,javascript-frameworks', 'ver': None},
-                {'app': 'jQuery', 'type': 'javascript-frameworks', 'ver': None},
-                {'app': 'Google Font API', 'type': 'font-scripts', 'ver': None},
-                {'app': 'PHP', 'type': 'programming-languages', 'ver': None}
+                {'app': 'Apache', 'type': 'Web Servers', 'ver': None},
+                {'app': 'Drupal', 'type': 'CMS', 'ver': '7'},
+                {'app': 'Lightbox', 'type': 'JavaScript Libraries', 'ver': None},
+                {'app': 'jQuery', 'type': 'JavaScript Libraries', 'ver': None},
+                {'app': 'Google Font API', 'type': 'Font Scripts', 'ver': None},
+                {'app': 'PHP', 'type': 'Programming Languages', 'ver': None}
             ]
         }
 
         results = self.mock_detector_run(url=cern_ch_test_data['geturl'], content=cern_ch_test_data['content'],
-                                         headers=cern_ch_test_data['headers'].items())
+                                         headers=cern_ch_test_data['headers'])
         assert list(six.iterkeys(results)) == list(six.iterkeys(expected))
         assert (sorted(next(six.itervalues(results)), key=operator.itemgetter('app')) ==
                 sorted(next(six.itervalues(expected)), key=operator.itemgetter('app')))
@@ -255,13 +259,13 @@ class TestDetector(unittest.TestCase):
         # headers etc.)
         expected = {
             'http://home.web.cern.ch/': [
-                {'app': 'Apache', 'type': 'web-servers', 'ver': None},
-                {'app': 'Drupal', 'type': 'cms', 'ver': '7'},
-                {'app': 'PHP', 'type': 'programming-languages', 'ver': None}
+                {'app': 'Apache', 'type': 'Web Servers', 'ver': None},
+                {'app': 'Drupal', 'type': 'CMS', 'ver': '7'},
+                {'app': 'PHP', 'type': 'Programming Languages', 'ver': None}
             ]
         }
         results = self.mock_detector_run(url=cern_ch_test_data['geturl'], content='',
-                                         headers=cern_ch_test_data['headers'].items())
+                                         headers=cern_ch_test_data['headers'])
         assert list(six.iterkeys(results)) == list(six.iterkeys(expected))
         assert (sorted(next(six.itervalues(results)), key=operator.itemgetter('app')) ==
                 sorted(next(six.itervalues(expected)), key=operator.itemgetter('app')))

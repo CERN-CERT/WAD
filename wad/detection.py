@@ -11,10 +11,10 @@ from wad import tools
 from wad.clues import Clues
 
 # TODO: Switch to BeautifulSoup or lxml for HTML parsing purposes
-re_meta = re.compile('<meta[^>]+>', re.IGNORECASE)
-re_content = re.compile('content\s*=\s*[\'"]([^\'"]+)[\'"]', re.IGNORECASE)
-re_name = re.compile('name\s*=\s*[\'"]([^\'"]+)[\'"]', re.IGNORECASE)
-re_script = re.compile('<script[^>]+src\s*=\s*["\']([^"\']*)', re.IGNORECASE)
+re_meta = re.compile(r'<meta[^>]+>', re.IGNORECASE)
+re_content = re.compile(r'content\s*=\s*[\'"]([^\'"]+)[\'"]', re.IGNORECASE)
+re_name = re.compile(r'name\s*=\s*[\'"]([^\'"]+)[\'"]', re.IGNORECASE)
+re_script = re.compile(r'<script[^>]+src\s*=\s*["\']([^"\']*)', re.IGNORECASE)
 
 TIMEOUT = 3
 
@@ -56,6 +56,7 @@ class Detector(object):
         findings += self.check_url(url)  # 'url'
         if page:
             findings += self.check_headers(page.info())  # 'headers'
+            findings += self.check_cookies(page.info())  # 'cookies'
         if content:
             findings += self.check_meta(content)  # 'meta'
             findings += self.check_script(content)  # 'script'
@@ -135,11 +136,12 @@ class Detector(object):
                 try:
                     ternary = re.match(r"^(.*)\?(.*):(.*)$", version_pattern)
                     if ternary:
+                        ver = ternary.group(3)
                         try:
-                            match.expand(ternary.group(1))
-                            ver = ternary.group(2)
+                            if match.expand(ternary.group(1)):
+                                ver = ternary.group(2)
                         except Exception:
-                            ver = ternary.group(3)
+                            pass
                     else:
                         ver = match.expand(version_pattern)
                 except Exception as e:
@@ -152,7 +154,7 @@ class Detector(object):
 
             logging.info("  + %-7s -> %s (%s): %s =~ %s", det, app, ver, show_text, re_raw)
 
-            res = [{'app': str(app), 'ver': ver}]
+            res = [{'app': str(app), 'ver': ver or None}]
             found += res
 
         return res
@@ -208,6 +210,27 @@ class Detector(object):
                     if entry.lower() in headers:
                         self.check_re(self.apps[app]['headers_re'][entry], self.apps[app]['headers'][entry],
                                       headers[entry.lower()], found, 'headers(%s)' % entry, app)
+        return found
+
+    def check_cookies(self, headers):
+        cookies = dict()
+        for cookie in headers.get('Set-Cookie', '').split(';'):
+            if '=' in cookie:
+                sep = cookie.index('=')
+                cookie_name = cookie[:sep].strip()
+                cookie_val = cookie[sep+1:].strip()
+                cookies[cookie_name] = cookie_val
+
+        if not cookies:
+            return []
+
+        found = []
+        for app in self.apps:
+            if 'cookies' in self.apps[app]:
+                for entry in self.apps[app]['cookies']:
+                    if entry in cookies:
+                        self.check_re(self.apps[app]['cookies_re'][entry], self.apps[app]['cookies'][entry],
+                                      cookies[entry], found, 'cookies(%s)' % entry, app)
         return found
 
     def implied_by(self, app_list):
