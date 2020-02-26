@@ -66,6 +66,10 @@ Secondly, the project has and will continue to naturally diverge from Wappalyzer
 Finally, additional features added into WAD project aren't ported into Wappalyzer at the same time.
 
 ## Changelog
+### 0.4.1 (2020-02-26)
+
+- Restored project long description on pypi
+
 ### 0.4 (2020-02-26)
 
 - Updated to latest apps.json, usability improvements
