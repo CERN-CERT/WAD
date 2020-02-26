@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # Author: Sebastian.Lopienski@cern.ch
@@ -9,7 +8,7 @@ import logging
 from optparse import OptionParser
 
 from wad import tools
-from wad.clues import Clues, CLUES_FILE
+from wad.clues import Clues
 from wad.detection import TIMEOUT, Detector
 from wad.group import group
 from wad.output import JSONOutput, CSVOutput, HumanReadableOutput
@@ -48,7 +47,7 @@ etc."""
     parser.add_option("-o", "--output", dest="output_file", metavar="FILE",
                       help="output file for detection results (default: STDOUT)")
 
-    parser.add_option("-c", "--clues", dest="clues_file", metavar="FILE", default=CLUES_FILE,
+    parser.add_option("-c", "--clues", dest="clues_file", metavar="FILE", default=None,
                       help="clues for detecting web applications and technologies")
 
     parser.add_option("-t", "--timeout", action="store", dest="TIMEOUT", default=timeout,
