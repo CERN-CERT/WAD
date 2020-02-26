@@ -85,12 +85,12 @@ class CSVOutput(OutputFormat):
         return self.return_handler(buf)
 
     def get_stringio(self):
-            return six.StringIO()
+        return six.StringIO()
 
     def get_file(self):
         try:
             return open(self.filename, 'wb')
-        except IOError:
+        except IOError as e:
             logging.error("Couldn't open %s while outputting results as csv", self.filename, tools.error_to_str(e))
             raise
 

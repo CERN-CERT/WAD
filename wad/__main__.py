@@ -38,7 +38,7 @@ etc."""
 
     parser.add_option("-l", "--limit", dest="limit", metavar="URLMASK",
                       help="in case of redirections, only include pages with URLs matching this mask - "
-                           "e.g. 'https?://[^/]*\.abc\.com/'")
+                           "e.g. 'https?://[^/]*\\.abc\\.com/'")
 
     parser.add_option("-x", "--exclude", dest="exclude", metavar="URLMASK",
                       help="in case of redirections, exclude pages with URL matching this mask - "

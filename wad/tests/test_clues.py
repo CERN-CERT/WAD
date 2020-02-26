@@ -86,7 +86,7 @@ def test_compile_clue():
     assert _Clues.compile_clue('abc') == {"re": re.compile("abc", flags=re.I)}
     assert _Clues.compile_clue(r'abc\;version:$1') == {"re": re.compile("abc", flags=re.I), "version": "$1"}
     assert _Clues.compile_clue(r'ab;c\;k:v1:v2\;aaa') == {"re": re.compile("ab;c", flags=re.I),
-                                                           "k": "v1:v2", "aaa": None}
+                                                          "k": "v1:v2", "aaa": None}
 
 
 def test_compile_clues():
