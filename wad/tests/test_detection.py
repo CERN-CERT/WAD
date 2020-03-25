@@ -105,7 +105,7 @@ class TestDetector(unittest.TestCase):
     def test_implied_by(self):
         # ASP implies WS and IIS and IIS implies WS;
         # but we already know about IIS, so the only new implied app is WS
-        assert self.detector.implied_by(['Microsoft ASP.NET', 'IIS']) == ['Windows Server']
+        assert self.detector.implied_by(['Microsoft ASP.NET', 'IIS']) == {'Windows Server'}
 
     def test_follow_implies(self):
         # empty findings
