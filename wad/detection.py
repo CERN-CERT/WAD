@@ -239,10 +239,11 @@ class Detector(object):
         return found
 
     def implied_by(self, app_list):
-        return list(set(six.moves.reduce(list.__add__,
-                                         [self.apps[app]['implies'] for app in app_list if 'implies' in self.apps[app]],
-                                         []))
-                    - set(app_list))
+        all_implied = [implied for app in app_list
+                       if 'implies' in self.apps.get(app, {})
+                       for implied in self.apps[app]['implies']]
+        implied_new = set(all_implied) - set(app_list)
+        return implied_new
 
     def follow_implies(self, findings):
         new = self.implied_by([f['app'] for f in findings])
