@@ -100,7 +100,10 @@ class Detector(object):
     def get_page(self, url, timeout=TIMEOUT):
         try:
             page = tools.urlopen(url, timeout=timeout)
-        except (six.moves.urllib.error.URLError, six.moves.http_client.HTTPException) as e:
+        except six.moves.urllib.error.HTTPError as e:
+            logging.warning("Error opening %s", url)
+            page = e
+        except six.moves.urllib.error.URLError as e:
             # a network problem? page unavailable? wrong URL?
             logging.warning("Error opening %s, terminating: %s", url, tools.error_to_str(e))
             return None
