@@ -49,7 +49,10 @@ class _Clues(object):
             raise
 
         try:
-            clues = json.load(json_data, encoding='utf-8')
+            if six.PY2:
+                clues = json.load(json_data, encoding='utf-8')
+            else:
+                clues = json.load(json_data)
         except ValueError as e:
             logging.error("Error while reading JSON file, terminating: %s", tools.error_to_str(e))
             raise
