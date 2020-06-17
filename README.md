@@ -66,6 +66,10 @@ Secondly, the project has and will continue to naturally diverge from Wappalyzer
 Finally, additional features added into WAD project aren't ported into Wappalyzer at the same time.
 
 ## Changelog
+### 0.4.3 (2020-05-16)
+
+- Fix the released package, same as 0.4.2 otherwise
+
 ### 0.4.2 (2020-05-15)
 
 - Removed deprecated argument 'encoding' from json.loads
