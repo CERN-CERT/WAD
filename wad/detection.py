@@ -81,8 +81,11 @@ class Detector(object):
 
         results = {}
         for url in urls:
-            res = self.detect(url, limit, exclude, timeout)
-            results.update(res)
+            try:
+                res = self.detect(url, limit, exclude, timeout)
+                results.update(res)
+            except Exception as e:
+                logging.warn("Error detecting %s: %s", url, e)
 
         return results
 
