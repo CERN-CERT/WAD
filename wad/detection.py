@@ -50,7 +50,7 @@ class Detector(object):
             return {}
 
         if six.PY3:
-            content = content.decode()
+            content = content.decode('latin-1')
 
         findings = self.findings(url, page.info(), content)
         findings += self.additional_checks(page, url, content)
