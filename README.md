@@ -66,6 +66,10 @@ Secondly, the project has and will continue to naturally diverge from Wappalyzer
 Finally, additional features added into WAD project aren't ported into Wappalyzer at the same time.
 
 ## Changelog
+### 0.4.6 (2020-09-28)
+
+- Write logging outputs to stderr instead of stdout
+
 ### 0.4.5 (2020-09-01)
 
 - Use latin-1 encoding for decoding page content

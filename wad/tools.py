@@ -70,4 +70,4 @@ def use_log_options(options):
     if options.log_file:
         logging.basicConfig(filename=options.log_file, level=log_level, format=log_format, datefmt=date_format)
     else:
-        logging.basicConfig(stream=sys.stdout, level=log_level, format=log_format, datefmt=date_format)
+        logging.basicConfig(stream=sys.stderr, level=log_level, format=log_format, datefmt=date_format)
