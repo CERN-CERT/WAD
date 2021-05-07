@@ -43,7 +43,7 @@ class _Clues(object):
     def read_clues_from_file(filename):
         logging.info("Reading clues file %s", filename)
         try:
-            json_data = open(filename)
+            json_data = open(filename, encoding='utf-8')
         except IOError as e:
             logging.error("Error while opening clues file, terminating: %s", tools.error_to_str(e))
             raise
