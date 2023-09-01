@@ -1,4 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
 import six
 
 import logging
@@ -16,8 +15,8 @@ def get_dir(url_path):
 
     # /path/file.ext -> /path
     e = normfilename.split("/")
-    if e[-1].find('.') >= 0:
-        return '/'.join(e[:-1]), True
+    if e[-1].find(".") >= 0:
+        return "/".join(e[:-1]), True
 
     # /path/something -> /path/something
     return normfilename, False
@@ -56,10 +55,12 @@ def group(results):
                 for finding in results[url]:
                     if finding in results[url2]:
                         results[url2].remove(finding)
-                        logging.debug("Removing %s from %s, as %s also has it", finding, url2, url)
+                        logging.debug(
+                            "Removing %s from %s, as %s also has it", finding, url2, url
+                        )
 
     # ... and then remove any urls without any findings
-    for url in results.keys():
+    for url in list(results.keys()):
         if not results[url]:
             results.pop(url)
 
